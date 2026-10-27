@@ -1,0 +1,16 @@
+ingest  lineage=cc-art2477  documentId=cc-art2477  version=v9  hash=sha256:ab421a21…  effectiveFrom=2019-06-18  length=2012
+extract  layer=structure  extractor=structure@v1  input=cc-art2477@v9  (fixture replay)
+tree: 8 nodes · [0,2011) · identical paths and types to tree-v8
+harness: structure class A — tree-v9 reconfirms tree-v8 (ev-0005); gate not applicable (structure golden set 1 item) → StructureVerified(actor=harness)
+acl structure→claims: 3 units  (c2 base 737 · c3 base 1209 · c5 base 1552)  causation ev-0018
+extract  layer=claims  extractor=claims@v1 (promoted)  units=3  (fixture replay)
+proposals: 6  — comparator NOT run (npm run compare)
+0016 · DocumentVersionIngested   · process(ingest)     · source    · cc-art2477@v9 ·
+0017 · StructureProposed         · agent(structure@v1) · structure · tree-v9       · ← ev-0016
+0018 ★ StructureVerified         · harness(compare)    · structure · tree-v9       · ← ev-0017  evidence: class A, same paths/types as tree-v8 (ev-0005)
+0019 · ClaimProposed             · agent(claims@v1)    · claims    · clm-eserc2b   · ← ev-0018
+0020 · ClaimProposed             · agent(claims@v1)    · claims    · clm-attivo4m  · ← ev-0018
+0021 · ClaimProposed             · agent(claims@v1)    · claims    · clm-ricavi4m  · ← ev-0018
+0022 · ClaimProposed             · agent(claims@v1)    · claims    · clm-dip20     · ← ev-0018
+0023 · ClaimProposed             · agent(claims@v1)    · claims    · clm-cess3     · ← ev-0018
+0024 · ClaimProposed             · agent(claims@v1)    · claims    · clm-term30    · ← ev-0018

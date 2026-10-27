@@ -1,37 +1,6 @@
-# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
-# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
-# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
-$ npm run seg1 -- extract --section art12 --text
-
-oneshot@v1 (fixture-replay, oneshot-p1) one-shot blob for art12, 1 edition(s) in the index:
+rag-extract  unit=v8/c2  extractor=one-shot  model=claude-<version> (illustrative)
 {
-  "articolo": "Art. 12",
-  "titolo": "Franchigie e scoperti",
-  "voci": [
-    {
-      "copertura": "Incendio",
-      "tipo": "franchigia",
-      "valore": "750 EUR"
-    },
-    {
-      "copertura": "Furto",
-      "tipo": "franchigia",
-      "valore": "250 EUR"
-    },
-    {
-      "copertura": "Furto",
-      "tipo": "scoperto",
-      "valore": "10 %"
-    },
-    {
-      "copertura": "Grandine",
-      "tipo": "franchigia",
-      "valore": "300 EUR"
-    },
-    {
-      "copertura": "Eventi atmosferici",
-      "tipo": "scoperto",
-      "valore": "15 %"
-    }
-  ]
+  "soglie": { "attivo": 2000000, "ricavi": 2000000, "dipendenti": 10 },
+  "esercizi_consecutivi": 3,
+  "regola": "due dei tre limiti"
 }

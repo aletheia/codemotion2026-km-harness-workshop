@@ -1,0 +1,4 @@
+extract  layer=structure  extractor=structure@v1  input=cc-art2477@v8  (fixture replay)
+tree: 8 nodes · [0,1990) · no overlaps · types: index×1, comma×6, note×1
+  header [0,328) · c1 [330,606) · abrogato(note) [608,718) · c2 [720,1190) · c3 [1192,1377) · c4 [1379,1531) · c5 [1533,1889) · c6 [1891,1990)
+0004 · StructureProposed         · agent(structure@v1) · structure · tree-v8       · ← ev-0003

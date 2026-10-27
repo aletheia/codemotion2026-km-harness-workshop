@@ -1,7 +1,3 @@
-# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
-# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
-# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
-$ npm run eval -- --extractor claims@v2 --summary --text
-
-eval claims@v2 on golden set claims@15: 4 expected item(s), theta 0.80; spans are absolute [start,end) with the section-local form after them
-TP 3  FP 2  FN 1   precision 0.60  recall 0.75
+eval  extractor=claims@v2  golden=claims@g1  --summary
+TP 3  FP 2  FN 1   precision 0.60   recall 0.75     (v1: 0.50 / 0.50)
+→ EvalCompleted ev-0048

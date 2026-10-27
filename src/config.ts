@@ -1,41 +1,62 @@
-// All thresholds, rates and fixed names live here. Every number below is
-// illustrative: it is a configuration value, not a measurement or a benchmark.
 // illustrative — not a benchmark
+// Every threshold, rate and cut-off of the repository lives here. None of them is a measured number.
 
 export const config = {
-  lineageId: 'casa-protetta',
-  /** The one section the workshop extracts claims from (Article 12, deductibles and co-insurance). */
-  sectionPath: 'art12',
-  /** IoU threshold for "span provenance correct" (half-open intervals). */
-  thetaIoU: 0.8,
-  /** Layer precision threshold for promotion criterion 1. */
-  promotion: {
-    layerPrecision: 0.9,
-    recallEpsilon: 0.02,
-    maxWrongProvenanceShare: 0.02,
+  paths: {
+    outDir: 'out',
+    log: 'out/events.jsonl',
+    projections: 'out/projections',
   },
-  /** Batch gate (online probes): count based. */
-  gate: {
+
+  log: {
+    logId: 'dnk-workshop',
+    format: 'events-jsonl-v1',
+  },
+
+  // Fixed clock: occurredAt = base + seq seconds, unless DNK_CLOCK=real.
+  clock: {
+    base: '2026-10-28T13:37:00Z',
+  },
+
+  // Bootstrap decision of log:init (seq 2).
+  bootstrap: {
+    extractor: 'claims',
+    version: 'claims@v1',
+    reviewer: 'luca',
+    note: 'initial version, no predecessor',
+  },
+
+  // Named golden-set cut-offs (seq numbers): g1 = end of segment 2.
+  golden: {
+    g1: 15,
+  },
+
+  eval: {
+    iouThreshold: 0.8,
+  },
+
+  promotion: {
+    precisionThreshold: 0.9,
+    recallEpsilon: 0.02,
+    maxWrongProvenanceRate: 0.02,
+  },
+
+  batchGate: {
+    probeRate: 0.05,
     probeMinimumExpectedItems: 10,
     maxFalseNegatives: 1,
     maxFalsePositives: 1,
-    maxCriticalErrors: 0,
   },
-  /** Audit sampling of class-A reconfirmations. */
+
   sampling: {
     humanRooted: 0.05,
     importRooted: 0.2,
-    belowProbeMinimum: 1.0, // DECISIONS.md #1: 100 % while the gate is not applicable
+    coldStart: 1.0,
   },
-  /** Segment 1 retriever: illustrative display settings, not tuned on anything. */
-  rag: { topK: 3, minScore: 0.5 },
-  /** Critical subset: subject-key classes whose regressions block promotion. */
-  criticalClasses: ['monetary', 'exclusion', 'time-limit'] as const,
-  /**
-   * Logical clock: occurredAt = clockBase + seq seconds. Real wall-clock time
-   * would make every run differ; the repo is deterministic end to end.
-   */
-  clockBase: '2026-10-28T13:00:00Z',
-  /** Actor ids used by deterministic steps. */
-  humanReviewerId: 'luca',
 } as const;
+
+export function occurredAt(seq: number, env: NodeJS.ProcessEnv = process.env): string {
+  if (env.DNK_CLOCK === 'real') return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+  // TODO(luca): 03-walkthrough-script.md shows seq 7 at 13:37:12Z; CLAUDE.md §1.4 (base + seq seconds) gives 13:37:07Z. Kept CLAUDE.md.
+  return new Date(Date.parse(config.clock.base) + seq * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+}

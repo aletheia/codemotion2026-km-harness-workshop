@@ -1,26 +1,13 @@
-# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
-# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
-# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
-$ npm run projections-diff -- --text
-
-claims@v1 (promoted)  vs  claims@v2 (candidate)
-
-cp-2024 art12: proposals by extractor version (absolute spans)
-  subject              claims@v1            claims@v2                  difference
-  fire.deductible      500 EUR [4238,4280)  500 EUR [4240,4280)        same
-  theft.deductible     250 EUR [4281,4320)  2.500 EUR [4281,4320)      changed
-  theft.coinsurance    15% [4321,4360)      10 % [4321,4360)           changed
-  hail.deductible      300 EUR [4430,4460)  -                          only-from
-  liability.limit      -                    1.000.000 EUR [4361,4420)  only-to
-  theft.limit          -                    5.000 EUR [4430,4460)      only-to
-
-cp-2025 art12: proposals by extractor version (absolute spans)
-  subject              claims@v1                  claims@v2                  difference
-  fire.deductible      750 EUR [4298,4340)        750 EUR [4300,4340)        same
-  theft.deductible     250 EUR [4341,4380)        250 EUR [4341,4380)        same
-  theft.coinsurance    10 % [4381,4420)           10 % [4381,4420)           same
-  liability.limit      1.000.000 EUR [4421,4480)  1.000.000 EUR [4421,4480)  same
-  hail.deductible      300 EUR [4481,4521)        300 EUR [4481,4521)        same
-  weather.coinsurance  5 % [4522,4571)            5 % [4522,4571)            same
-
-CurrentBeliefs: 4 beliefs, hash 7ef5238c7afb304f; it is built from verified claims only, so claims@v2 changes it only after ExtractorVersionPromoted.
+projections-diff  promoted=claims@v1  candidate=claims@v2  lineage=cc-art2477  per document version  (candidate = v2 proposals folded as if verified; not a belief)
+version  subject                promoted (v1, verified)      candidate (v2, proposed)     status
+v8       attivo.limite          2,000,000 EUR (superseded)   2,000,000 EUR                same
+v8       ricavi.limite          2,000,000 EUR (superseded)   2,000 EUR                    DIFFERS
+v8       esercizi.consecutivi   2 (superseded)               2                            same
+v8       dipendenti.limite      10 (superseded)              10                           same
+v8       cessazione.esercizi    —                            3                            candidate only (not in unit c2)
+v9       attivo.limite          4,000,000 EUR                4,000,000 EUR                same
+v9       ricavi.limite          4,000,000 EUR                4,000,000 EUR                same
+v9       dipendenti.limite      20                           20                           same
+v9       esercizi.consecutivi   2                            2                            same
+v9       cessazione.esercizi    — (proposed)                 3                            candidate only
+v9       assemblea.termine      — (proposed)                 30 giorni                    candidate only

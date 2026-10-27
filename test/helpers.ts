@@ -1,38 +1,74 @@
-import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
+import { deriveClaimId } from '../src/domain/claim';
+import { documentId, lineageId, type ClaimId } from '../src/domain/ids';
+import type { Span } from '../src/domain/span';
+import type { Actor } from '../src/events/actor';
+import type { ClaimContested, ClaimEvent, ClaimProposed, ClaimSuperseded, ClaimVerified } from '../src/events/catalogue';
+import { deriveEventId, producerOf } from '../src/events/eventId';
 
-export const root = resolve(__dirname, '..');
-const tsx = join(root, 'node_modules', '.bin', 'tsx');
+export const tmpLog = (): string => join(mkdtempSync(join(tmpdir(), 'dnk-')), 'out', 'events.jsonl');
 
-export interface Sandbox { dir: string; env: NodeJS.ProcessEnv; eventsFile: string; lines(): string[] }
+export const actors = {
+  agent: { kind: 'agent', id: 'claims-extractor', modelId: 'claude-test', promptVersion: 'p3', extractorVersion: 'claims@v1' },
+  human: { kind: 'human', id: 'luca' },
+  harness: { kind: 'harness', id: 'compare', rule: 'class-A' },
+  import: { kind: 'import', id: 'register', source: 'compliance-register.csv' },
+  process: { kind: 'process', id: 'acl' },
+} as const satisfies Record<Actor['kind'], Actor>;
 
-export function sandbox(): Sandbox {
-  const dir = mkdtempSync(join(tmpdir(), 'harness-test-'));
-  for (const d of ['events', 'projections', 'state']) mkdirSync(join(dir, d));
-  const env = { ...process.env, HARNESS_EVENTS_DIR: join(dir, 'events'), HARNESS_PROJECTIONS_DIR: join(dir, 'projections'), HARNESS_STATE_DIR: join(dir, 'state') };
-  const eventsFile = join(dir, 'events', 'events.jsonl');
-  return { dir, env, eventsFile, lines: () => (existsSync(eventsFile) ? readFileSync(eventsFile, 'utf8').split('\n').filter(Boolean) : []) };
+export const span: Span = { documentId: documentId('cc-art2477'), version: 'v8', start: 1067, end: 1126 };
+export const CLAIM = deriveClaimId(documentId('cc-art2477'), 'v8', 'ricavi.limite', { type: 'money', amount: 2_000_000, currency: 'EUR' });
+export const OTHER = deriveClaimId(documentId('cc-art2477'), 'v9', 'ricavi.limite', { type: 'money', amount: 4_000_000, currency: 'EUR' });
+
+function envelope<T extends string>(type: T, actor: Actor, aggregateId: string) {
+  return {
+    eventId: deriveEventId({ producer: producerOf(actor), inputArtifactId: 'test', extractorVersion: null, eventType: type, aggregateId }),
+    seq: 1,
+    aggregateVersion: 1,
+    type,
+    layer: 'claims' as const,
+    aggregateId,
+    actor,
+    correlationId: 'test',
+    occurredAt: '2026-10-28T13:37:01Z',
+  };
 }
 
-export interface Run { status: number; stdout: string; stderr: string; json: Record<string, unknown> | null }
-
-/** Runs `tsx tools/<tool>.ts ...args` exactly as the npm script does. */
-export function tool(sb: Sandbox, name: string, ...args: string[]): Run {
-  const r = spawnSync(tsx, [join(root, 'tools', `${name}.ts`), ...args], { cwd: root, env: sb.env, encoding: 'utf8' });
-  let json: Record<string, unknown> | null = null;
-  try { json = JSON.parse(r.stdout) as Record<string, unknown>; } catch { /* not json */ }
-  return { status: r.status ?? -1, stdout: r.stdout, stderr: r.stderr, json };
+export function proposed(actor: Actor, spans: readonly Span[] = [span]): ClaimProposed {
+  return {
+    ...envelope('ClaimProposed', actor, CLAIM),
+    payload: {
+      claimId: CLAIM, lineageId: lineageId('cc-art2477'), subjectKey: 'ricavi.limite',
+      normalizedValue: { type: 'money', amount: 2_000_000, currency: 'EUR' },
+      spans: spans as [Span, ...Span[]], sectionPath: 'c2',
+    },
+  };
 }
 
-export function listTs(dir: string): string[] {
-  const out: string[] = [];
-  for (const n of readdirSync(dir)) {
-    const p = join(dir, n);
-    if (statSync(p).isDirectory()) out.push(...listTs(p));
-    else if (p.endsWith('.ts')) out.push(p);
-  }
-  return out;
+export function verified(actor: Actor, evidence: ClaimVerified['evidence']): ClaimVerified {
+  return { ...envelope('ClaimVerified', actor, CLAIM), payload: { claimId: CLAIM }, evidence };
 }
-export const read = (p: string): string => readFileSync(p, 'utf8');
+
+export function contested(actor: Actor, conflictingClaimId: ClaimId = OTHER): ClaimContested {
+  return {
+    ...envelope('ClaimContested', actor, CLAIM),
+    payload: { claimId: CLAIM, conflictingClaimId },
+    evidence: {
+      dimension: 'same-subject-different-value',
+      values: [{ type: 'money', amount: 2_000_000, currency: 'EUR' }, { type: 'money', amount: 4_000_000, currency: 'EUR' }],
+      spans: [span, { ...span, version: 'v9' }],
+    },
+  };
+}
+
+export function superseded(actor: Actor, reason: ClaimSuperseded['evidence']['reason'], successor: ClaimId = OTHER): ClaimSuperseded {
+  return { ...envelope('ClaimSuperseded', actor, CLAIM), payload: { claimId: CLAIM, successor }, evidence: { reason } };
+}
+
+export const humanNote = { kind: 'human', note: 'ok' } as const;
+export const classA = { kind: 'class-A', reconfirmedBeliefId: OTHER, batchId: 'btc-v9-01', probeResult: 'not-applicable' } as const;
+export const importRecord = { kind: 'import', sourceRecord: 'register row 4' } as const;
+
+export type { ClaimEvent };

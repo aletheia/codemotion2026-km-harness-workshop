@@ -1,39 +1,35 @@
-# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
-# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
-# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
-$ npm run log-cat -- --text
-
-seq · type                     · actor                      · aggregate               · caused by
-  1 · LogInitialised           · process:log-init           · log                     · -
-  2 · ExtractorVersionPromoted · human:luca                 · extractor:claims        · 1 LogInitialised
-  3 · DocumentVersionIngested  · process:ingest             · doc:cp-2024             · -
-  4 · StructureProposed        · agent:structure-extractor  · tree-cp-2024            · 3 DocumentVersionIngested
-  5 · StructureVerified        · human:luca                 · tree-cp-2024            · 4 StructureProposed
-  6 · ClaimProposed            · agent:claims-extractor     · claim:f011ef24          · 5 StructureVerified
-  7 · ClaimProposed            · agent:claims-extractor     · claim:9294bff5          · 5 StructureVerified
-  8 · ClaimProposed            · agent:claims-extractor     · claim:53ba3d41          · 5 StructureVerified
-  9 · ClaimProposed            · agent:claims-extractor     · claim:e538ec7c          · 5 StructureVerified
- 10 · ClaimVerified            · human:luca                 · claim:f011ef24          · 6 ClaimProposed
- 11 · ClaimVerified            · human:luca                 · claim:9294bff5          · 7 ClaimProposed
- 12 · ClaimProposed            · human:luca                 · claim:1252c624          · 5 StructureVerified
- 13 · ClaimVerified            · human:luca                 · claim:1252c624          · 12 ClaimProposed
- 14 · ClaimProposed            · human:luca                 · claim:d90d7e37          · 5 StructureVerified
- 15 · ClaimVerified            · human:luca                 · claim:d90d7e37          · 14 ClaimProposed
- 16 · DocumentVersionIngested  · process:ingest             · doc:cp-2025             · -
- 17 · StructureProposed        · agent:structure-extractor  · tree-cp-2025            · 16 DocumentVersionIngested
- 18 · StructureVerified        · harness:comparator         · tree-cp-2025            · 17 StructureProposed
- 19 · ClaimProposed            · agent:claims-extractor     · claim:53a92970          · 18 StructureVerified
- 20 · ClaimProposed            · agent:claims-extractor     · claim:d302aaa8          · 18 StructureVerified
- 21 · ClaimProposed            · agent:claims-extractor     · claim:f46e5cc0          · 18 StructureVerified
- 22 · ClaimProposed            · agent:claims-extractor     · claim:b06b8724          · 18 StructureVerified
- 23 · ClaimProposed            · agent:claims-extractor     · claim:a99f694f          · 18 StructureVerified
- 24 · ClaimProposed            · agent:claims-extractor     · claim:c8278a27          · 18 StructureVerified
- 25 · ClaimContested           · harness:comparator         · claim:53a92970          · 19 ClaimProposed
- 26 · ClaimVerified            · harness:comparator         · claim:d302aaa8          · 20 ClaimProposed
- 27 · ClaimSuperseded          · harness:comparator         · claim:9294bff5          · 26 ClaimVerified
- 28 · ClaimVerified            · harness:comparator         · claim:f46e5cc0          · 21 ClaimProposed
- 29 · ClaimSuperseded          · harness:comparator         · claim:1252c624          · 28 ClaimVerified
- 30 · ClaimVerified            · harness:comparator         · claim:b06b8724          · 22 ClaimProposed
- 31 · ClaimSuperseded          · harness:comparator         · claim:d90d7e37          · 30 ClaimVerified
- 32 · ClaimVerified            · human:luca                 · claim:53a92970          · 25 ClaimContested
- 33 · ClaimSuperseded          · human:luca                 · claim:f011ef24          · 10 ClaimVerified
+0001 · LogInitialised            · process(log-init)   · source    · log           ·
+0002 ★ ExtractorVersionPromoted  · human(luca)         · harness   · claims@v1     ·            evidence: initial version, no predecessor
+0003 · DocumentVersionIngested   · process(ingest)     · source    · cc-art2477@v8 ·
+0004 · StructureProposed         · agent(structure@v1) · structure · tree-v8       · ← ev-0003
+0005 ★ StructureVerified         · human(luca)         · structure · tree-v8       · ← ev-0004  evidence: 8/8 nodes, intervals cover 0..1990
+0006 · ClaimProposed             · agent(claims@v1)    · claims    · clm-attivo2m  · ← ev-0005
+0007 · ClaimProposed             · agent(claims@v1)    · claims    · clm-ricavi2m  · ← ev-0005
+0008 · ClaimProposed             · agent(claims@v1)    · claims    · clm-eserc3    · ← ev-0005
+0009 · ClaimProposed             · agent(claims@v1)    · claims    · clm-capitale  · ← ev-0005
+0010 ★ ClaimVerified             · human(luca)         · claims    · clm-attivo2m  · ← ev-0006  evidence: note "ok"; span [998,1062)
+0011 ★ ClaimVerified             · human(luca)         · claims    · clm-ricavi2m  · ← ev-0007  evidence: note "ok"; span [1067,1126)
+0012 · ClaimProposed             · human(luca)         · claims    · clm-eserc2    · ← ev-0005
+0013 ★ ClaimVerified             · human(luca)         · claims    · clm-eserc2    · ← ev-0012  evidence: note "added by reviewer"
+0014 · ClaimProposed             · human(luca)         · claims    · clm-dip10     · ← ev-0005
+0015 ★ ClaimVerified             · human(luca)         · claims    · clm-dip10     · ← ev-0014  evidence: note "missing in v1 output"
+0016 · DocumentVersionIngested   · process(ingest)     · source    · cc-art2477@v9 ·
+0017 · StructureProposed         · agent(structure@v1) · structure · tree-v9       · ← ev-0016
+0018 ★ StructureVerified         · harness(compare)    · structure · tree-v9       · ← ev-0017  evidence: class A, same paths/types as tree-v8 (ev-0005)
+0019 · ClaimProposed             · agent(claims@v1)    · claims    · clm-eserc2b   · ← ev-0018
+0020 · ClaimProposed             · agent(claims@v1)    · claims    · clm-attivo4m  · ← ev-0018
+0021 · ClaimProposed             · agent(claims@v1)    · claims    · clm-ricavi4m  · ← ev-0018
+0022 · ClaimProposed             · agent(claims@v1)    · claims    · clm-dip20     · ← ev-0018
+0023 · ClaimProposed             · agent(claims@v1)    · claims    · clm-cess3     · ← ev-0018
+0024 · ClaimProposed             · agent(claims@v1)    · claims    · clm-term30    · ← ev-0018
+0025 ★ ClaimVerified             · harness(compare)    · claims    · clm-eserc2b   · ← ev-0019  evidence: A: belief clm-eserc2 (ev-0013) · btc-v9-01
+0026 ★ ClaimSuperseded           · harness(compare)    · claims    · clm-eserc2    · ← ev-0025  evidence: reconfirmation-chain → clm-eserc2b
+0027 ★ ClaimContested            · harness(compare)    · claims    · clm-attivo4m  · ← ev-0020  evidence: C: conflicts clm-attivo2m (2,000,000 ≠ 4,000,000)
+0028 ★ ClaimContested            · harness(compare)    · claims    · clm-ricavi4m  · ← ev-0021  evidence: C: conflicts clm-ricavi2m (2,000,000 ≠ 4,000,000)
+0029 ★ ClaimContested            · harness(compare)    · claims    · clm-dip20     · ← ev-0022  evidence: C: conflicts clm-dip10 (10 ≠ 20)
+0030 ★ ClaimVerified             · human(luca)         · claims    · clm-attivo4m  · ← ev-0027  evidence: note "L. 55/2019 in force from 2019-06-18"
+0031 ★ ClaimSuperseded           · human(luca)         · claims    · clm-attivo2m  · ← ev-0030  evidence: successor clm-attivo4m; valid until 2019-06-18
+0032 ★ ClaimVerified             · human(luca)         · claims    · clm-ricavi4m  · ← ev-0028  evidence: note "L. 55/2019 in force from 2019-06-18"
+0033 ★ ClaimSuperseded           · human(luca)         · claims    · clm-ricavi2m  · ← ev-0032  evidence: successor clm-ricavi4m; valid until 2019-06-18
+0034 ★ ClaimVerified             · human(luca)         · claims    · clm-dip20     · ← ev-0029  evidence: note "L. 55/2019 in force from 2019-06-18"
+0035 ★ ClaimSuperseded           · human(luca)         · claims    · clm-dip10     · ← ev-0034  evidence: successor clm-dip20; valid until 2019-06-18

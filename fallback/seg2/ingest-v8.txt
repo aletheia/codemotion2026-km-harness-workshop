@@ -1,0 +1,2 @@
+ingest  lineage=cc-art2477  documentId=cc-art2477  version=v8  hash=sha256:7f98bb0c…  effectiveFrom=2019-03-16  effectiveTo=2019-06-17  length=1991
+0003 · DocumentVersionIngested   · process(ingest)     · source    · cc-art2477@v8 ·

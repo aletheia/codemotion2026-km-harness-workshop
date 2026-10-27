@@ -1,12 +1,10 @@
-# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
-# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
-# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
-$ npm run ask -- --q "franchigia incendio" --as-of 2024-03-01 --text
-
-ask  "franchigia incendio"  as-of=2024-03-01  policy: monetary → human-rooted verified only
-subject: fire.deductible (Franchigia incendio); edition cp-2024@2024, in force 2024-01-01 → 2025-01-01
-answer: 500 EUR
-  belief   f011ef24  verified by human:luca at seq 10
-  evidence span cp-2024@2024 [4240,4280)  "Incendio: franchigia di 500 EUR a evento"  (proposed span [4238,4280); the verified span is the reviewer's)
-  superseded later by 53a92970 (750 EUR, seq 33) — not applicable on 2024-03-01
-log read through seq 44; sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read
+ask  "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo"  as-of=2019-04-30  policy: monetary, time-limit → human-rooted verified only
+answer: 2,000,000 EUR
+  belief   clm-ricavi2m   verified by human(luca) at ev-0011   in force 2019-03-16 → 2019-06-18
+  evidence span cc-art2477@v8 [1067,1126)  "ricavi delle vendite e delle prestazioni: 2 milioni di euro"
+  superseded later by clm-ricavi4m (ev-0033) — not applicable on 2019-04-30
+ask  "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo"  as-of=now
+answer: 4,000,000 EUR
+  belief   clm-ricavi4m   verified by human(luca) at ev-0032 after ClaimContested ev-0028   successor of clm-ricavi2m
+  evidence span cc-art2477@v9 [1084,1143)  "ricavi delle vendite e delle prestazioni: 4 milioni di euro"
+sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read

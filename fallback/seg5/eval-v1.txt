@@ -1,13 +1,9 @@
-# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
-# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
-# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
-$ npm run eval -- --extractor claims@v1 --text
-
-eval claims@v1 on golden set claims@15: 4 expected item(s), theta 0.80; spans are absolute [start,end) with the section-local form after them
-  subject              expected                             proposed                       IoU          outcome
-  fire.deductible      500 EUR [4240,4280) [120,160)        500 EUR [4238,4280) [118,160)  0.95 (40/42) correct: TP
-  theft.deductible     250 EUR [4281,4320) [161,200)        250 EUR [4281,4320) [161,200)  1.00 (39/39) correct: TP
-  theft.coinsurance    10 % [4321,4360) [201,240)           15% [4321,4360) [201,240)      1.00 (39/39) wrong value: 1 FP + 1 FN
-  liability.limit      1.000.000 EUR [4361,4420) [241,300)  -                              -            not proposed: FN
-  hail.deductible      -                                    300 EUR [4430,4460) [310,340)  -            not expected: FP
-TP 2  FP 2  FN 2   precision 0.50  recall 0.50
+eval  extractor=claims@v1  golden=claims@g1 (until seq 15, 4 expected)  theta_iou=0.80 (illustrative)   spans: absolute [c2-local]
+expected                                      proposal (v1)                                  IoU    outcome          counts
+attivo.limite 2,000,000 [1000,1062) [280,342)  attivo.limite 2,000,000 [998,1062) [278,342)  0.97   correct          TP
+ricavi.limite 2,000,000 [1067,1126) [347,406)  ricavi.limite 2,000,000 [1067,1126) [347,406) 1.00   correct          TP
+esercizi.consecutivi 2 [936,964) [216,244)     esercizi.consecutivi 3 [936,964) [216,244)    1.00   wrong value      FP + FN
+dipendenti.limite 10 [1131,1189) [411,469)     —                                             —      missing          FN
+—                                             capitale.soglia "minimo s.p.a." [720,799)     —      unexpected       FP
+TP 2  FP 2  FN 2   precision 0.50   recall 0.50
+→ EvalCompleted ev-0047

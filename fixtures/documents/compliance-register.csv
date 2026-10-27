@@ -1,0 +1,5 @@
+lineage,subject_key,value,unit,applies_from,note
+cc-art2477,attivo.limite,4000000,EUR,2019-06-18,illustrative register of the thresholds the firm applies today
+cc-art2477,ricavi.limite,4000000,EUR,2019-06-18,illustrative
+cc-art2477,dipendenti.limite,20,count,2019-06-18,illustrative
+cc-art2477,esercizi.consecutivi,2,years,2019-06-18,illustrative

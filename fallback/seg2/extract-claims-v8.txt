@@ -1,0 +1,6 @@
+extract  layer=claims  extractor=claims@v1 (promoted)  units=1  (c2, base offset 720)  (fixture replay)
+proposals: 4
+0006 · ClaimProposed             · agent(claims@v1)    · claims    · clm-attivo2m  · ← ev-0005
+0007 · ClaimProposed             · agent(claims@v1)    · claims    · clm-ricavi2m  · ← ev-0005
+0008 · ClaimProposed             · agent(claims@v1)    · claims    · clm-eserc3    · ← ev-0005
+0009 · ClaimProposed             · agent(claims@v1)    · claims    · clm-capitale  · ← ev-0005

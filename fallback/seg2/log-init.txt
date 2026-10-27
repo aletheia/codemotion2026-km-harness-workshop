@@ -1,0 +1,3 @@
+log-init  out/events.jsonl created  (append-only; duplicate eventId → ignored)
+0001 · LogInitialised            · process(log-init)   · source    · log           ·
+0002 ★ ExtractorVersionPromoted  · human(luca)         · harness   · claims@v1     ·            evidence: initial version, no predecessor

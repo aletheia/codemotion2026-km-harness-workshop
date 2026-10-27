@@ -1,8 +1,6 @@
-# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
-# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
-# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
-$ npm run seg1 -- query --q "franchigia incendio" --text
-
-query "franchigia incendio" over 90 chunks; fields per result: rank, chunkId, score, text
-  #1  score 0.7327  78e357f8d2607336  Incendio: franchigia di 750 EUR a evento
-  #2  score 0.7221  43deba1186dd99e4  Incendio: franchigia di 500 EUR a evento
+rag-query  index=cc-art2477  chunks=37  top_k=3  q="soglia ricavi nomina organo di controllo"
+score  chunk                      text (trimmed)
+0.871  cc-art2477-v8 #7           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo … 2 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 2 milioni di euro; …
+0.868  cc-art2477-v9 #7           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo … 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; …
+0.842  cc-art2477-v7 #6           … c) per due esercizi consecutivi ha superato due dei limiti indicati dal primo comma dell'articolo 2435-bis.
+fields available per chunk: id, source_file, text, vector

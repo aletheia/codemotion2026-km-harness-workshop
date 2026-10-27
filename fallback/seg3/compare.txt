@@ -1,0 +1,13 @@
+compare  batch=btc-v9-01  proposals=6  beliefs=4
+batch gate: not applicable (golden set 4 expected items < minimum 10, illustrative); class-A audit sampling 100 %
+clm-eserc2b    esercizi.consecutivi   2            A  reconfirms clm-eserc2 (human)           → ClaimVerified(harness)
+clm-attivo4m   attivo.limite          4,000,000    C  conflicts clm-attivo2m (2,000,000 EUR)   → ClaimContested
+clm-ricavi4m   ricavi.limite          4,000,000    C  conflicts clm-ricavi2m (2,000,000 EUR)   → ClaimContested
+clm-dip20      dipendenti.limite      20           C  conflicts clm-dip10 (10)                 → ClaimContested
+clm-cess3      cessazione.esercizi    3            B  no belief                                → ReviewQueue
+clm-term30     assemblea.termine      30 giorni    B  no belief                                → ReviewQueue
+0025 ★ ClaimVerified             · harness(compare)    · claims    · clm-eserc2b   · ← ev-0019  evidence: A: belief clm-eserc2 (ev-0013) · btc-v9-01
+0026 ★ ClaimSuperseded           · harness(compare)    · claims    · clm-eserc2    · ← ev-0025  evidence: reconfirmation-chain → clm-eserc2b
+0027 ★ ClaimContested            · harness(compare)    · claims    · clm-attivo4m  · ← ev-0020  evidence: C: conflicts clm-attivo2m (2,000,000 ≠ 4,000,000)
+0028 ★ ClaimContested            · harness(compare)    · claims    · clm-ricavi4m  · ← ev-0021  evidence: C: conflicts clm-ricavi2m (2,000,000 ≠ 4,000,000)
+0029 ★ ClaimContested            · harness(compare)    · claims    · clm-dip20     · ← ev-0022  evidence: C: conflicts clm-dip10 (10 ≠ 20)
