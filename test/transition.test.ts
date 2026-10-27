@@ -36,6 +36,9 @@ const EVENTS: Record<string, ClaimEvent> = {
 const ALLOWED: Record<string, ClaimState> = {
   '—|propose/agent': 'proposed',
   '—|propose/human': 'proposed',
+  // Re-proposal of an existing claim (another extractor, same claim id): agreement, state unchanged.
+  ...Object.fromEntries((['proposed', 'verified', 'contested', 'superseded'] as const).flatMap((s) =>
+    (['agent', 'human'] as const).map((a) => [`${s}|propose/${a}`, s]))),
   'proposed|verify/human': 'verified',
   'proposed|verify/import': 'verified',
   'proposed|verify/harness-classA': 'verified',            // harness exception 1: class A

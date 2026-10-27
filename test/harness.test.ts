@@ -19,7 +19,8 @@ const v9 = (start: number, end: number): Span => ({ ...v8(start, end), version: 
 function belief(subjectKey: SubjectKey, value: NormalizedValue, spans: Span[]): Belief {
   return {
     claimId: '00000000000000aa', label: 'clm-belief', lineageId: 'cc-art2477', subjectKey, value, spans,
-    proposedEventId: '00000000000000a1', verifiedBy: 'human', verifiedEventId: '00000000000000a2', root: { kind: 'human', claimId: '00000000000000aa' },
+    proposedEventId: '00000000000000a1', verifiedBy: 'human', verifierId: 'luca', verifiedEventId: '00000000000000a2',
+    root: { kind: 'human', claimId: '00000000000000aa', eventId: '00000000000000a2' },
   };
 }
 const beliefs = (...bs: Belief[]): ReadonlyMap<BeliefKey, Belief> => new Map(bs.map((b) => [beliefKey(b.lineageId, b.subjectKey), b]));

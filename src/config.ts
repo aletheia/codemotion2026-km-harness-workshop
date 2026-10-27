@@ -40,6 +40,8 @@ export const config = {
   // Fixed clock: occurredAt = base + seq seconds, unless DNK_CLOCK=real.
   clock: {
     base: '2026-10-28T13:37:00Z',
+    // Duration printed by projections:build under the fixed clock, so the output is byte-identical across runs.
+    projectionsBuildMs: 12,
   },
 
   // Bootstrap decision of log:init (seq 2).

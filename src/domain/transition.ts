@@ -10,6 +10,12 @@
 // The two harness exceptions: harness may verify only with class-A evidence, and may supersede only a
 // verified claim with reason 'reconfirmation-chain' (identical-value reconfirmation). Everything else
 // that is not in the table is a TransitionError. superseded is terminal; a verified claim is immutable.
+//
+// Re-proposal: the claim id is the hash of what is claimed (document version, subject, value), not of who
+// claims it, so another extractor (claims@v2 on replay) proposing the same claim emits a ClaimProposed on an
+// existing aggregate. That is agreement, not a transition: the state is unchanged, whatever it is.
+// TODO(luca): 04 §5 lists only — → proposed for ClaimProposed; the re-proposal rule follows from the claim
+// identity of §1/§3 and from "extractor agreement" in the ReviewQueue of §6.
 import type { ClaimEvent } from '../events/catalogue';
 import type { ClaimState } from './claim';
 import type { ClaimId } from './ids';
@@ -32,10 +38,9 @@ export function transition(state: ClaimState | null, event: ClaimEvent, ctx: Tra
 
   switch (event.type) {
     case 'ClaimProposed':
-      if (state !== null) return refuse('claim already exists');
       if (actor !== 'agent' && actor !== 'human') return refuse('only an agent or a human proposes');
       if (event.payload.spans.length < 1) return refuse('a Claim needs at least one Span');
-      return 'proposed';
+      return state ?? 'proposed';               // an existing claim keeps its state (re-proposal)
 
     case 'ClaimVerified':
       if (state === 'proposed') {

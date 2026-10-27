@@ -21,6 +21,12 @@ export const scriptNarration: Readonly<Record<string, string>> = {
   'show:ricavi-v8': 'prints the ricavi.limite proposal as JSON: span, normalized value, extractor version, causation',
   'compare': 'the harness compares each v9 proposal with the current beliefs: class A verified, B queued, C contested',
   'layers-4-6': 'prints a hand-authored excerpt of the entities, policies and workflow layers (never appended to the log)',
+  'projections:drop': 'deletes out/projections/: projections are disposable, the log is not',
+  'projections:build': 'rebuilds every projection as a fold over out/events.jsonl',
+  'replay:claims-v2': 'replays the Claims layer from the same verified trees with extractor claims@v2: new proposals, nothing verified',
+  'projections:diff': 'compares the beliefs of the promoted extractor (claims@v1) with the candidate claims@v2',
+  'beliefs:at-2019-04-30': 'the beliefs valid on 2019-04-30 (valid time), folded from the log',
+  'beliefs': 'the beliefs valid today, folded from the log',
 };
 
 export function narrate(script: string | undefined): void {

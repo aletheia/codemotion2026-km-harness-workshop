@@ -31,7 +31,7 @@ export interface ClaimsStep {
 export function extractClaimsStep(
   version: string,
   sections: readonly string[],
-  opts: { extractorVersion?: string; path?: string } = {},
+  opts: { extractorVersion?: string; path?: string; correlationId?: string } = {},
 ): ClaimsStep {
   const path = opts.path ?? config.paths.log;
   const events = readLog(path);
@@ -46,7 +46,7 @@ export function extractClaimsStep(
   const ingested = ingestedVersion(events, tree.payload.documentId, version);
   if (!ingested) throw new Error(`${tree.payload.documentId}@${version} not ingested`);
 
-  const correlationId = `run-${version}-${sections.join('-')}-01`;
+  const correlationId = opts.correlationId ?? `run-${version}-${sections.join('-')}-01`;
   const { text } = sourceToStructure(ingested);
   const acl = structureToClaims(verified, tree.payload, text, { sections, correlationId });
   if (acl.rejected) {

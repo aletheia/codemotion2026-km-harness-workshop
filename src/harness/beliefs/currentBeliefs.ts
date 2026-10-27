@@ -11,7 +11,7 @@ import type { NormalizedValue, SubjectKey } from '../../domain/claim';
 import type { Span } from '../../domain/span';
 import type { ActorKind } from '../../events/actor';
 import { claimStates } from '../../events/fold';
-import { ofType } from '../../events/lookup';
+import { firstProposals, ofType } from '../../events/lookup';
 import type { LogEvent } from '../../events/schema';
 
 /** `${lineageId}|${subjectKey}`, e.g. 'cc-art2477|ricavi.limite': one belief per key. */
@@ -32,9 +32,10 @@ export interface Belief {
   readonly proposedEventId: string;
   /** The actor of the last verification; 'harness' for a class-A reconfirmation. */
   readonly verifiedBy: Extract<ActorKind, 'human' | 'harness' | 'import'>;
+  readonly verifierId: string;              // 'luca', 'compare'
   readonly verifiedEventId: string;
-  /** Who the evidence chain ends at, and on which claim. */
-  readonly root: { readonly kind: RootKind; readonly claimId: string };
+  /** Who the evidence chain ends at: the kind, the claim and the verification event of the root. */
+  readonly root: { readonly kind: RootKind; readonly claimId: string; readonly eventId: string };
 }
 
 export class BeliefInvariantViolated extends Error {
@@ -48,7 +49,8 @@ export class BeliefInvariantViolated extends Error {
 /** Folds the whole log; throws if a claim event breaks the lifecycle or the one-belief-per-key invariant. */
 export function build(events: readonly LogEvent[]): ReadonlyMap<BeliefKey, Belief> {
   const states = claimStates(events);
-  const proposals = new Map(ofType(events, 'ClaimProposed').map((e) => [e.payload.claimId, e] as const));
+  // The first proposal of each claim: a re-proposal by a candidate extractor does not change its label or spans.
+  const proposals = firstProposals(events);
 
   // The verification of each verified claim, and the root of its chain (resolved in log order).
   const verifiedBy = new Map<string, Extract<LogEvent, { type: 'ClaimVerified' }>>();
@@ -64,7 +66,7 @@ export function build(events: readonly LogEvent[]): ReadonlyMap<BeliefKey, Belie
       roots.set(id, root);
     } else {
       // A human or import verification is its own root.
-      roots.set(id, { kind: v.evidence.kind, claimId: id });
+      roots.set(id, { kind: v.evidence.kind, claimId: id, eventId: v.eventId });
     }
   }
 
@@ -86,6 +88,7 @@ export function build(events: readonly LogEvent[]): ReadonlyMap<BeliefKey, Belie
       spans: p.payload.spans as Span[],
       proposedEventId: p.eventId,
       verifiedBy: v.actor.kind,
+      verifierId: v.actor.id,
       verifiedEventId: v.eventId,
       root: roots.get(claimId)!,
     });

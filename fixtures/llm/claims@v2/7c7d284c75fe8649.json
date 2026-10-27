@@ -1,0 +1,52 @@
+{
+  "extractor": "claims",
+  "version": "v2",
+  "modelId": "claude-<version>",
+  "promptVersion": "p4",
+  "inputHash": "7c7d284c75fe8649",
+  "request": {
+    "prompt": "Estrai le grandezze del comma: chiave del catalogo, valore come appare nel testo, span locale [start, end).",
+    "unit": {
+      "documentId": "cc-art2477",
+      "version": "v9",
+      "path": "c2",
+      "text": "La nomina dell'organo di controllo o del revisore è obbligatoria se la società:\na) è tenuta alla redazione del bilancio consolidato;\nb) controlla una società obbligata alla revisione legale dei conti;\nc) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 20 unità."
+    }
+  },
+  "response": {
+    "claims": [
+      {
+        "subjectKey": "attivo.limite",
+        "value": "4 milioni di euro",
+        "span": {
+          "start": 280,
+          "end": 342
+        }
+      },
+      {
+        "subjectKey": "ricavi.limite",
+        "value": "4 milioni di euro",
+        "span": {
+          "start": 347,
+          "end": 406
+        }
+      },
+      {
+        "subjectKey": "dipendenti.limite",
+        "value": "20 unità",
+        "span": {
+          "start": 411,
+          "end": 469
+        }
+      },
+      {
+        "subjectKey": "esercizi.consecutivi",
+        "value": "due esercizi",
+        "span": {
+          "start": 216,
+          "end": 244
+        }
+      }
+    ]
+  }
+}

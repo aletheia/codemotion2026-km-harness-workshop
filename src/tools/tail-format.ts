@@ -24,9 +24,10 @@ export function displayLabel(e: LogEvent, labelOf?: (aggregateId: string) => str
   return typeof payload.label === 'string' ? payload.label : labelOf?.(e.aggregateId) ?? e.aggregateId;
 }
 
-/** Records the label a ClaimProposed carries, keyed by its claim id (= aggregate id). */
+/** Records the label a ClaimProposed carries, keyed by its claim id (= aggregate id). The first proposal
+ *  names the claim: a re-proposal by another extractor (clm-v2-attivo2m) does not rename clm-attivo2m. */
 export function rememberLabel(labels: Map<string, string>, e: LogEvent): void {
-  if (e.type === 'ClaimProposed' && e.payload.label) labels.set(e.aggregateId, e.payload.label);
+  if (e.type === 'ClaimProposed' && e.payload.label && !labels.has(e.aggregateId)) labels.set(e.aggregateId, e.payload.label);
 }
 
 export function truncate(text: string, max = EVIDENCE_MAX): string {
@@ -103,6 +104,8 @@ export interface FormatOptions {
   readonly causeOf?: (eventId: string) => string | undefined;
   /** Overrides the 60-character evidence limit (layers-4-6 prints the excerpt's evidence in full). */
   readonly evidenceMax?: number;
+  /** Widens the label column (replay: the claims@v2 labels are up to 15 characters). */
+  readonly labelWidth?: number;
 }
 
 export function formatTailLine(e: LogEvent, opts: FormatOptions = {}): string {
@@ -112,7 +115,7 @@ export function formatTailLine(e: LogEvent, opts: FormatOptions = {}): string {
     `${seq} ${marker} ${e.type.padEnd(WIDTH.type)}`,
     displayActor(e.actor).padEnd(WIDTH.actor),
     e.layer.padEnd(WIDTH.layer),
-    displayLabel(e, opts.labelOf).padEnd(WIDTH.label),
+    displayLabel(e, opts.labelOf).padEnd(Math.max(WIDTH.label, opts.labelWidth ?? 0)),
   ].join(' · ') + ' ·';
 
   let cause = '';
@@ -127,10 +130,25 @@ export function formatTailLine(e: LogEvent, opts: FormatOptions = {}): string {
   return line;
 }
 
+/**
+ * One line for a run of events of the same type and actor, seq shown as a range ('0041–0046'); the type
+ * column is shortened by the extra seq width so the actor and layer columns stay aligned with formatTailLine.
+ */
+export function formatTailRange(from: number, to: number, sample: LogEvent, what: string): string {
+  const seq = `${displaySeq(from)}–${displaySeq(to)}`;
+  const marker = isDecision(sample) ? '★' : '·';
+  return [
+    `${seq} ${marker} ${sample.type.padEnd(WIDTH.type - (seq.length - displaySeq(from).length))}`,
+    displayActor(sample.actor).padEnd(WIDTH.actor),
+    sample.layer.padEnd(WIDTH.layer),
+    what,
+  ].join(' · ');
+}
+
 /** Formats a whole log; causation ids and claim labels resolve against the events given. */
-export function formatLog(events: readonly LogEvent[]): string[] {
+export function formatLog(events: readonly LogEvent[], opts: Pick<FormatOptions, 'labelWidth'> = {}): string[] {
   const seqById = new Map(events.map((e) => [e.eventId, e.seq] as const));
   const labels = new Map<string, string>();
   for (const e of events) rememberLabel(labels, e);
-  return events.map((e) => formatTailLine(e, { seqOf: (id) => seqById.get(id), labelOf: (id) => labels.get(id) }));
+  return events.map((e) => formatTailLine(e, { ...opts, seqOf: (id) => seqById.get(id), labelOf: (id) => labels.get(id) }));
 }

@@ -19,9 +19,18 @@ export const verifiedTree = (events: readonly LogEvent[], treeId: string): Of<'S
 export const promotedVersion = (events: readonly LogEvent[], extractor: string): string | undefined =>
   ofType(events, 'ExtractorVersionPromoted').filter((e) => e.payload.extractor === extractor).at(-1)?.payload.version;
 
-/** Claim id → display label, from the ClaimProposed events that carry one. */
+/** Claim id → display label, from the first ClaimProposed of each claim that carries one. */
 export function claimLabels(events: readonly LogEvent[]): ReadonlyMap<string, string> {
-  return new Map(ofType(events, 'ClaimProposed').flatMap((e) => (e.payload.label ? [[e.payload.claimId, e.payload.label] as const] : [])));
+  const labels = new Map<string, string>();
+  for (const e of ofType(events, 'ClaimProposed')) if (e.payload.label && !labels.has(e.payload.claimId)) labels.set(e.payload.claimId, e.payload.label);
+  return labels;
+}
+
+/** Claim id → its first ClaimProposed: the proposal that defines label, spans and section of the claim. */
+export function firstProposals(events: readonly LogEvent[]): ReadonlyMap<string, Of<'ClaimProposed'>> {
+  const first = new Map<string, Of<'ClaimProposed'>>();
+  for (const e of ofType(events, 'ClaimProposed')) if (!first.has(e.payload.claimId)) first.set(e.payload.claimId, e);
+  return first;
 }
 
 export const treeIdOf = (version: string): string => `tree-${version}`;

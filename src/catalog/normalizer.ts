@@ -66,6 +66,9 @@ export function displayValue(v: NormalizedValue): string {
   }
 }
 
+/** Form in belief and diff tables: money with its currency, integers bare, days in Italian ("30 giorni"). */
+export const tableValue = (v: NormalizedValue): string => (v.type === 'money' ? displayValue(v) : shortValue(v));
+
 /** Compact form for tables and conflict evidence: "2,000,000", "10", "2", "30 giorni" (days keep the Italian word). */
 export function shortValue(v: NormalizedValue): string {
   if (v.type === 'money') return v.amount.toLocaleString('en-US');

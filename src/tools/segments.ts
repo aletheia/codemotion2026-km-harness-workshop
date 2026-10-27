@@ -49,4 +49,17 @@ export const segments: Readonly<Record<number, Segment>> = {
       { script: 'layers-4-6', why: 'Entities, policies and workflow built on the same log: an excerpt, not appended.' },
     ],
   },
+  4: {
+    title: 'The log, projections, replay, temporal query',
+    expectsEvents: 35,
+    steps: [
+      { script: 'log:cat', why: 'Thirty-five events: everything we know and how we came to know it.' },
+      { script: 'projections:drop', why: 'Projections are disposable: we delete them…' },
+      { script: 'projections:build', why: '…and rebuild them from the log, identical.' },
+      { script: 'replay:claims-v2', why: 'A new extractor version replays the Claims layer from the same verified trees: proposals only.' },
+      { script: 'projections:diff', why: 'What would change if claims@v2 were promoted: one value differs, and it is a monetary threshold.' },
+      { script: 'beliefs:at-2019-04-30', why: 'Valid time: what the law said on 30 April 2019…' },
+      { script: 'beliefs', why: '…and what it says today, from the same log.' },
+    ],
+  },
 };

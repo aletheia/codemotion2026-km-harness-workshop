@@ -13,7 +13,7 @@ import type { Span } from '../domain/span';
 import { deriveEventId } from '../events/eventId';
 import { assertTransition, claimStates } from '../events/fold';
 import { append, readLog, type AppendResult, type EventDraft } from '../events/log';
-import { ingestedVersion, ofType, proposedTree, verifiedTree } from '../events/lookup';
+import { ingestedVersion, ofType, promotedVersion, proposedTree } from '../events/lookup';
 import type { LogEvent } from '../events/schema';
 import { build, type Belief } from '../harness/beliefs/currentBeliefs';
 import { compare, compareStructure, type Comparison } from '../harness/compare/comparator';
@@ -108,7 +108,9 @@ export interface BatchComparison {
  * same document version: the first v9 run is btc-v9-01.
  */
 export function currentBatch(events: readonly LogEvent[]): { batchId: string; proposals: ProposedEvent[] } | undefined {
-  const agentProposals = ofType(events, 'ClaimProposed').filter((e) => e.actor.kind === 'agent');
+  // Only the promoted extractor's proposals: the harness never compares a candidate version (claims@v2 on replay).
+  const promoted = promotedVersion(events, 'claims');
+  const agentProposals = ofType(events, 'ClaimProposed').filter((e) => e.actor.kind === 'agent' && e.actor.extractorVersion === promoted);
   const last = agentProposals.at(-1);
   if (!last) return undefined;
   const version = last.payload.spans[0]!.version;
