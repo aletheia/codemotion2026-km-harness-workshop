@@ -21,6 +21,15 @@
         { "action": "add", "documentId": "cc-art2477", "version": "v8", "sectionPath": "c2", "subjectKey": "dipendenti.limite",
           "value": "10 unità", "span": { "start": 1131, "end": 1189 }, "note": "missing in v1 output" }
       ]
+    },
+    {
+      "id": "conflicts-v9",
+      "title": "contested claims of cc-art2477@v9 (c2)",
+      "decisions": [
+        { "action": "resolve", "claim": "clm-attivo4m", "supersedes": "clm-attivo2m", "note": "L. 55/2019 in force from 2019-06-18" },
+        { "action": "resolve", "claim": "clm-ricavi4m", "supersedes": "clm-ricavi2m", "note": "L. 55/2019 in force from 2019-06-18" },
+        { "action": "resolve", "claim": "clm-dip20", "supersedes": "clm-dip10", "note": "L. 55/2019 in force from 2019-06-18" }
+      ]
     }
   ]
 }

@@ -7,8 +7,15 @@ import type { Span } from '../src/domain/span';
 import type { Actor } from '../src/events/actor';
 import type { ClaimContested, ClaimEvent, ClaimProposed, ClaimSuperseded, ClaimVerified } from '../src/events/catalogue';
 import { deriveEventId, producerOf } from '../src/events/eventId';
+import type { EventDraft } from '../src/events/log';
 
 export const tmpLog = (): string => join(mkdtempSync(join(tmpdir(), 'dnk-')), 'out', 'events.jsonl');
+
+/** A test event without the fields the log assigns, ready for append(). */
+export const draftOf = <T extends { seq: number; aggregateVersion: number; occurredAt: string }>(e: T): EventDraft => {
+  const { seq: _s, aggregateVersion: _a, occurredAt: _o, ...draft } = e;
+  return draft as unknown as EventDraft;
+};
 
 export const actors = {
   agent: { kind: 'agent', id: 'claims-extractor', modelId: 'claude-test', promptVersion: 'p3', extractorVersion: 'claims@v1' },
@@ -68,7 +75,9 @@ export function superseded(actor: Actor, reason: ClaimSuperseded['evidence']['re
 }
 
 export const humanNote = { kind: 'human', note: 'ok' } as const;
-export const classA = { kind: 'class-A', reconfirmedBeliefId: OTHER, batchId: 'btc-v9-01', probeResult: 'not-applicable' } as const;
+export const classA = {
+  kind: 'class-A', reconfirmedBeliefId: OTHER, beliefEventId: '0123456789abcdef', batchId: 'btc-v9-01', probeResult: 'not-applicable', auditSampled: true,
+} as const;
 export const importRecord = { kind: 'import', sourceRecord: 'register row 4' } as const;
 
 export type { ClaimEvent };

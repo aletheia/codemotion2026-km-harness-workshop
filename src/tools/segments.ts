@@ -38,4 +38,15 @@ export const segments: Readonly<Record<number, Segment>> = {
       { script: 'review', auto: 'review:auto', why: 'The human verifies two claims, leaves two proposed and adds the two the agent missed.' },
     ],
   },
+  3: {
+    title: 'Context map, ACL, three classes: ingest v9',
+    expectsEvents: 15,
+    steps: [
+      { script: 'ingest:v9', why: 'A new edition of the same lineage arrives: v9 does not overwrite v8, it follows it.' },
+      { script: 'extract:v9', why: 'Same tree shape as v8: the harness reconfirms it (class A), then claims@v1 proposes six claims.' },
+      { script: 'compare', why: 'The harness classifies each proposal against current beliefs: A reconfirms, B is new, C conflicts.' },
+      { script: 'review', auto: 'review:auto', why: 'The human resolves only the conflicts: three verified, three superseded, with the evidence on screen.' },
+      { script: 'layers-4-6', why: 'Entities, policies and workflow built on the same log: an excerpt, not appended.' },
+    ],
+  },
 };

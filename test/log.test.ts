@@ -1,15 +1,10 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { append, EventRejected, LogInvalid, readLog, type EventDraft } from '../src/events/log';
+import { append, EventRejected, LogInvalid, readLog } from '../src/events/log';
 import { claimStates } from '../src/events/fold';
 import { formatLog } from '../src/tools/tail-format';
 import { logInit } from '../src/tools/log-init';
-import { actors, CLAIM, humanNote, proposed, tmpLog, verified } from './helpers';
-
-const draftOf = <T extends { seq: number; aggregateVersion: number; occurredAt: string }>(e: T) => {
-  const { seq: _s, aggregateVersion: _a, occurredAt: _o, ...draft } = e;
-  return draft as unknown as EventDraft;
-};
+import { actors, CLAIM, draftOf, humanNote, proposed, tmpLog, verified } from './helpers';
 
 describe('append', () => {
   it('assigns seq, aggregateVersion and the fixed-clock occurredAt', () => {

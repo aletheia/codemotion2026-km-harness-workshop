@@ -37,6 +37,9 @@ const byKey = new Map(SUBJECTS.map((s) => [s.key as string, s]));
 
 export const lookupSubject = (key: string): Subject | undefined => byKey.get(key);
 
+/** The catalogue as the comparator consumes it. */
+export const catalog = { lookup: lookupSubject } as const;
+
 export const isCritical = (key: string): boolean => {
   const s = lookupSubject(key);
   return s !== undefined && CRITICAL_CLASSES.has(s.cls);

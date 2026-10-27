@@ -17,14 +17,15 @@ export type ClaimProposed = FactEvent<'ClaimProposed', {
 
 export type ClaimVerified = DecisionEvent<'ClaimVerified', { claimId: ClaimId },
   | { kind: 'human';   note: string; checkedSpan?: Span }
-  | { kind: 'class-A'; reconfirmedBeliefId: ClaimId; batchId: string; probeResult: 'passed' | 'not-applicable' }
+  | { kind: 'class-A'; reconfirmedBeliefId: ClaimId; beliefEventId: string; batchId: string;
+      probeResult: 'passed' | 'not-applicable'; auditSampled: boolean }
   | { kind: 'import';  sourceRecord: string }>;
 
 export type ClaimContested = DecisionEvent<'ClaimContested', { claimId: ClaimId; conflictingClaimId: ClaimId },
   { dimension: 'same-subject-different-value'; values: [NormalizedValue, NormalizedValue]; spans: [Span, Span] }>;
 
 export type ClaimSuperseded = DecisionEvent<'ClaimSuperseded', { claimId: ClaimId; successor: ClaimId },
-  { reason: 'human-resolution' | 'reconfirmation-chain'; note?: string }>;
+  { reason: 'human-resolution' | 'reconfirmation-chain'; note?: string; validUntil?: string }>;
 
 export type ClaimEvent = ClaimProposed | ClaimVerified | ClaimContested | ClaimSuperseded;
 

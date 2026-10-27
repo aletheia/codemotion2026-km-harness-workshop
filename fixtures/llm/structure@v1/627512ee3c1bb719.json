@@ -1,0 +1,68 @@
+{
+  "extractor": "structure",
+  "version": "v1",
+  "modelId": "claude-<version>",
+  "promptVersion": "s1",
+  "inputHash": "627512ee3c1bb719",
+  "request": {
+    "prompt": "Segmenta il testo in nodi (header, commi, note) con intervalli di caratteri assoluti [start, end).",
+    "unit": {
+      "documentId": "cc-art2477",
+      "version": "v9",
+      "path": "document",
+      "text": "Codice civile (R.D. 16 marzo 1942, n. 262)\nLibro V, Titolo V, Capo VII, Sezione III - Dell'amministrazione della società e dei controlli\nArt. 2477 - Sindaco e revisione legale dei conti\nTesto in vigore dal 2019-06-18 (D.L. 18 aprile 2019, n. 32, art. 2-bis, conv. L. 14 giugno 2019, n. 55)\nFonte: Normattiva, atto 042U0262, art. 2477, versione 9\n\nL'atto costitutivo può prevedere, determinandone le competenze e i poteri, ivi compresa la revisione legale dei conti, la nomina di un organo di controllo o di un revisore. Se lo statuto non dispone diversamente, l'organo di controllo è costituito da un solo membro effettivo.\n\nCOMMA ABROGATO DAL D.L. 24 GIUGNO 2014, N. 91, CONVERTITO, CON MODIFICAZIONI, DALLA L. 11 AGOSTO 2014, N. 116.\n\nLa nomina dell'organo di controllo o del revisore è obbligatoria se la società:\na) è tenuta alla redazione del bilancio consolidato;\nb) controlla una società obbligata alla revisione legale dei conti;\nc) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 20 unità.\n\nL'obbligo di nomina dell'organo di controllo o del revisore di cui alla lettera c) del secondo comma cessa quando, per tre esercizi consecutivi, non è superato alcuno dei predetti limiti.\n\nNel caso di nomina di un organo di controllo, anche monocratico, si applicano le disposizioni sul collegio sindacale previste per le società per azioni.\n\nL'assemblea che approva il bilancio in cui vengono superati i limiti indicati al secondo comma deve provvedere, entro trenta giorni, alla nomina dell'organo di controllo o del revisore. Se l'assemblea non provvede, alla nomina provvede il tribunale su richiesta di qualsiasi soggetto interessato o su segnalazione del conservatore del registro delle imprese.\n\nSi applicano le disposizioni dell'articolo 2409 anche se la società è priva di organo di controllo.\n"
+    }
+  },
+  "response": {
+    "nodes": [
+      {
+        "path": "header",
+        "type": "index",
+        "start": 0,
+        "end": 345
+      },
+      {
+        "path": "c1",
+        "type": "comma",
+        "start": 347,
+        "end": 623
+      },
+      {
+        "path": "abrogato",
+        "type": "note",
+        "start": 625,
+        "end": 735
+      },
+      {
+        "path": "c2",
+        "type": "comma",
+        "start": 737,
+        "end": 1207
+      },
+      {
+        "path": "c3",
+        "type": "comma",
+        "start": 1209,
+        "end": 1396
+      },
+      {
+        "path": "c4",
+        "type": "comma",
+        "start": 1398,
+        "end": 1550
+      },
+      {
+        "path": "c5",
+        "type": "comma",
+        "start": 1552,
+        "end": 1910
+      },
+      {
+        "path": "c6",
+        "type": "comma",
+        "start": 1912,
+        "end": 2011
+      }
+    ]
+  }
+}

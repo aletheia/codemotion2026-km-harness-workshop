@@ -3,8 +3,9 @@
 // (opens with a double click, offline, no server) and exits. With ANTHROPIC_API_KEY set (environment, or a .env
 // file: --env, the current directory, or the checkout that holds the log), the Explain panel asks Claude Haiku
 // to tell the story of a log row; without it nothing leaves the machine. .env is excluded from git. Not part of the walkthrough: it re-reads the log on every request, so it follows
-// the live run. Read-only: --write (set a claim's state from the Claims tab) arrives with ws-seg3, since it checks
-// the one-belief-per-key invariant of the comparator's beliefs fold.
+// the live run. Read-only by default. With --write the Claims tab can set a claim verified as
+// human(reviewer) or supersede it with a chosen successor, the same events the reviewer CLI appends; never use
+// it during the demo, since every append shifts the seq of everything the walkthrough appends after it.
 // Zero dependencies: node:http.
 import { createServer, type IncomingMessage } from 'node:http';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -12,14 +13,18 @@ import { dirname, join, resolve } from 'node:path';
 import { config } from '../config';
 import { displayValue } from '../catalog/normalizer';
 import type { ClaimState, NormalizedValue } from '../domain/claim';
-import { readLog } from '../events/log';
-import { isClaimEvent } from '../events/fold';
+import type { ClaimId } from '../domain/ids';
+import { append, readLog, type EventDraft } from '../events/log';
+import { assertTransition, claimStates, isClaimEvent } from '../events/fold';
 import type { ClaimEvent } from '../events/catalogue';
 import { isTransitionError, transition } from '../domain/transition';
-import { proposedTree } from '../events/lookup';
+import { ingestedVersion, proposedTree } from '../events/lookup';
+import { deriveEventId } from '../events/eventId';
+import { beliefKey, build as buildBeliefs } from '../harness/beliefs/currentBeliefs';
 import { isDecision, type LogEvent } from '../events/schema';
 import { chunkParagraphs } from '../rag-baseline/chunk';
 import { argValue, hasFlag, run } from './cli';
+import { readExcerpt } from './layers-4-6';
 import { displayActor, displayEventId, displayLabel, evidenceSummary, formatLog, rememberLabel } from './tail-format';
 
 const sourceText = (version: string): string | undefined => {
@@ -62,7 +67,7 @@ function logView(events: readonly LogEvent[]) {
     cause: e.causationId ? (seqById.has(e.causationId) ? displayEventId(seqById.get(e.causationId)!) : e.causationId.slice(0, 8)) : null,
     causeSeq: e.causationId ? seqById.get(e.causationId) ?? null : null,
     focus: focusOf(e, events, firstProposal),
-    evidence: evidenceSummary(e) ?? null,
+    evidence: evidenceSummary(e, { seqOf: (id) => seqById.get(id), labelOf: (id) => labels.get(id), evidenceMax: 200 }) ?? null,
     tail: lines[i],
     raw: e,
   }));
@@ -147,25 +152,27 @@ const documents = (): Record<string, string> =>
 
 interface GraphNode {
   readonly id: string;
-  readonly kind: 'document' | 'tree' | 'claim';
+  readonly kind: 'document' | 'tree' | 'claim' | 'entity' | 'policy' | 'workflow';
   readonly label: string;
   readonly detail: string;
   readonly state: string;
   readonly version?: string;
   readonly row?: string;              // claims: the subject key they share a row with
+  readonly excerpt?: boolean;         // layers 4-6: pre-computed, never in the log
   lastSeq?: number;                   // the latest log row about this node (the Explain panel follows it)
 }
 interface GraphEdge {
   readonly from: string;
   readonly to: string;
-  readonly kind: 'structure' | 'extracts' | 'reconfirmed-by' | 'superseded-by' | 'conflict';
+  readonly kind: 'structure' | 'extracts' | 'reconfirmed-by' | 'superseded-by' | 'conflict' | 'mentions' | 'references' | 'effect' | 'precondition';
 }
 
 /**
- * The dependencies between the artifacts of the first three layers, as of the events given: every edge is read
- * from an event (ingest → tree → claims; supersession with its reason; open conflicts). Layers 4-6 join with ws-seg3.
+ * The dependencies between the artifacts of the six layers, as of the events given: every edge is read from an
+ * event (ingest → tree → claims; supersession with its reason; open conflicts) or, for layers 4-6, from the
+ * pre-computed excerpt, whose nodes appear once a claim they reference exists.
  */
-function graphView(events: readonly LogEvent[], states: ReadonlyMap<string, ClaimState>) {
+function graphView(events: readonly LogEvent[], states: ReadonlyMap<string, ClaimState>, excerpt: readonly LogEvent[]) {
   const nodes: GraphNode[] = [];
   const edges: GraphEdge[] = [];
   const has = new Set<string>();
@@ -194,6 +201,29 @@ function graphView(events: readonly LogEvent[], states: ReadonlyMap<string, Clai
       edges.push({ from: `claim:${e.payload.conflictingClaimId}`, to: `claim:${e.payload.claimId}`, kind: 'conflict' });
     }
   }
+
+  // Layers 4-6: shown only once the claims they rest on are in the log up to this row.
+  const policyOfEvent = new Map<string, string>();
+  for (const e of excerpt) {
+    if (e.type === 'EntityProposed' && has.has(`claim:${e.payload.claimId}`)) {
+      const resolved = excerpt.some((x) => x.type === 'EntityResolved' && x.payload.claimId === e.payload.claimId);
+      add({ id: `entity:${e.payload.candidateEntityId}`, kind: 'entity', label: e.payload.candidateEntityId, detail: `"${e.payload.mention}"`, state: resolved ? 'verified' : 'proposed', excerpt: true });
+      edges.push({ from: `entity:${e.payload.candidateEntityId}`, to: `claim:${e.payload.claimId}`, kind: 'mentions' });
+    } else if (e.type === 'PolicyProposed' && e.payload.claimIds.some((c) => has.has(`claim:${c}`))) {
+      const p = e.payload;
+      const verified = excerpt.find((x) => x.type === 'PolicyVerified' && x.payload.policyId === p.policyId);
+      if (verified) policyOfEvent.set(verified.eventId, p.policyId);
+      add({ id: `policy:${p.policyId}`, kind: 'policy', label: p.policyId, detail: (p.effect as { text?: string }).text ?? 'policy', state: verified ? 'verified' : 'proposed', excerpt: true });
+      for (const c of p.claimIds) if (has.has(`claim:${c}`)) edges.push({ from: `policy:${p.policyId}`, to: `claim:${c}`, kind: 'references' });
+      const entity = (p.effect as { entity?: string }).entity;
+      if (entity && has.has(`entity:${entity}`)) edges.push({ from: `policy:${p.policyId}`, to: `entity:${entity}`, kind: 'effect' });
+    } else if (e.type === 'WorkflowStepProposed' && e.causationId && policyOfEvent.has(e.causationId)) {
+      const p = e.payload;
+      const verified = excerpt.some((x) => x.type === 'WorkflowStepVerified' && x.payload.stepId === p.stepId);
+      add({ id: `workflow:${p.stepId}`, kind: 'workflow', label: `${p.workflowId} #${p.position}`, detail: p.outputs.join(', '), state: verified ? 'verified' : 'proposed', excerpt: true });
+      edges.push({ from: `workflow:${p.stepId}`, to: `policy:${policyOfEvent.get(e.causationId)}`, kind: 'precondition' });
+    }
+  }
   // The latest row about each node: its ingest, its tree events, or any Claims event on the claim.
   const byId = new Map(nodes.map((n) => [n.id, n] as const));
   for (const e of events) {
@@ -205,11 +235,13 @@ function graphView(events: readonly LogEvent[], states: ReadonlyMap<string, Clai
   return { nodes, edges: edges.filter((x) => has.has(x.from) && has.has(x.to)) };
 }
 
+const EXCERPT_EVENTS = (() => { try { return readExcerpt(); } catch { return []; } })();
+
 /** Claims as the fold of the first `at` events: moving `at` back shows what was believed at that row of the log. */
 function claimsAt(events: readonly LogEvent[], at: number) {
   const slice = events.slice(0, at);
   const { states, warnings } = displayStates(slice);
-  return { claims: claimsView(slice, states), graph: graphView(slice, states), warnings };
+  return { claims: claimsView(slice, states), graph: graphView(slice, states, EXCERPT_EVENTS), warnings };
 }
 
 /** Tabs this checkout has not built yet, each with the tag that adds it: the page names the tag instead of breaking. */
@@ -240,6 +272,95 @@ function exportSnapshot(path: string, out: string, page: string): number {
 }
 
 class Refused extends Error {}
+
+type TargetState = 'verified' | 'superseded';
+interface StateChange { readonly to: TargetState; readonly note: string; readonly successor?: string }
+
+/**
+ * Changes a claim's state as human(reviewer), within the lifecycle table (04-domain-model-reference.md §5):
+ *   proposed  → verified    ClaimVerified; refused if the key already has a verified belief (that is a conflict)
+ *   contested → verified    ClaimVerified, then ClaimSuperseded on the belief it conflicts with (as `review` does)
+ *   verified | contested → superseded   ClaimSuperseded with a successor on the same (lineage, subject key)
+ * A human never contests (harness only) and superseded is terminal. The drafts are folded over the log with
+ * transition() and the one-belief-per-key invariant before anything is appended, so a refused change writes
+ * nothing. eventIds follow the reviewer CLI's derivation, so the scripted stages never append a decision twice.
+ */
+function changeState(path: string, claimId: string, change: StateChange): number[] {
+  const note = change.note.trim();
+  if (!note) throw new Refused('a decision needs a note');
+  const events = readLog(path);
+  const proposals = new Map(events.flatMap((e) => (e.type === 'ClaimProposed' ? [[e.payload.claimId, e] as const] : [])));
+  const proposal = proposals.get(claimId);
+  if (!proposal) throw new Refused(`no ClaimProposed for ${claimId}`);
+  const p = proposal.payload;
+  const name = (id: string) => proposals.get(id)?.payload.label ?? id.slice(0, 8);
+  const current = claimStates(events).get(claimId as ClaimId) ?? 'proposed';
+  const actor = { kind: 'human', id: config.reviewer } as const;
+  const producer = `human:${config.reviewer}`;
+  const base = { layer: 'claims', actor, correlationId: 'review-viewer' } as const;
+  // The successor's version ends the superseded claim's valid time when it comes from another version.
+  const validUntil = (target: string, successorId: string) => {
+    const span = proposals.get(successorId)?.payload.spans[0];
+    if (!span || span.version === proposals.get(target)?.payload.spans[0]?.version) return {};
+    const from = ingestedVersion(events, span.documentId, span.version)?.payload.effectiveFrom;
+    return from ? { validUntil: from } : {};
+  };
+  const supersede = (target: string, successor: string, inputArtifactId: string): EventDraft => ({
+    ...base,
+    eventId: deriveEventId({ producer, inputArtifactId, extractorVersion: null, eventType: 'ClaimSuperseded', aggregateId: target }),
+    type: 'ClaimSuperseded',
+    aggregateId: target,
+    causationId: inputArtifactId,
+    payload: { claimId: target, successor },
+    evidence: { reason: 'human-resolution', note, ...validUntil(target, successor) },
+  });
+
+  let drafts: EventDraft[];
+  if (change.to === 'verified') {
+    if (current !== 'proposed' && current !== 'contested') throw new Refused(`${name(claimId)} is ${current}: only a proposed or contested claim can be verified`);
+    const belief = buildBeliefs(events).get(beliefKey(p.lineageId, p.subjectKey));
+    if (current === 'proposed' && belief) throw new Refused(`${p.subjectKey} already has a verified belief (${name(belief.claimId)}): a different value is a conflict, supersede the belief instead`);
+    // A contested claim is verified from its contest, like the reviewer's resolve stage.
+    const contest = current === 'contested' ? [...events].reverse().find((e) => e.type === 'ClaimContested' && e.payload.claimId === claimId) : undefined;
+    const cause = contest?.eventId ?? proposal.eventId;
+    const verifyId = deriveEventId({ producer, inputArtifactId: cause, extractorVersion: null, eventType: 'ClaimVerified', aggregateId: claimId });
+    drafts = [{
+      ...base,
+      eventId: verifyId,
+      type: 'ClaimVerified',
+      aggregateId: claimId,
+      causationId: cause,
+      payload: { claimId },
+      evidence: contest ? { kind: 'human', note } : { kind: 'human', note, checkedSpan: p.spans[0]! },
+    }];
+    if (contest && belief) drafts.push(supersede(belief.claimId, claimId, verifyId));
+  } else {
+    if (current !== 'verified' && current !== 'contested') throw new Refused(`${name(claimId)} is ${current}: only a verified or contested claim can be superseded`);
+    const successor = change.successor;
+    const next = successor ? proposals.get(successor) : undefined;
+    if (!successor || !next) throw new Refused('choose the claim that supersedes it');
+    if (successor === claimId) throw new Refused('a claim cannot supersede itself');
+    if (next.payload.lineageId !== p.lineageId || next.payload.subjectKey !== p.subjectKey) throw new Refused(`the successor must be on ${p.lineageId} · ${p.subjectKey}`);
+    drafts = [supersede(claimId, successor, next.eventId)];
+  }
+
+  // Dry run through the domain: the lifecycle table on every draft, then the one-belief-per-key invariant.
+  const simulated = [...events];
+  for (const draft of drafts) {
+    try {
+      assertTransition(simulated, draft);
+    } catch (err) {
+      throw new Refused(err instanceof Error ? err.message : String(err));
+    }
+    simulated.push({ ...draft, seq: simulated.length + 1, aggregateVersion: 0, occurredAt: '' } as LogEvent);
+  }
+  try {
+    buildBeliefs(simulated);
+  } catch (err) {
+    throw new Refused(err instanceof Error ? err.message : String(err));
+  }
+  return drafts.map((draft) => append(path, draft).seq);
+}
 
 // ---------------------------------------------------------------- explainer (opt-in, network)
 // Raw fetch to the Messages API rather than @anthropic-ai/sdk: the repository adds no dependency after phase A.
@@ -380,8 +501,7 @@ await run('viewer', () => {
   const argv = process.argv.slice(2);
   const port = Number(argValue(argv, 'port') ?? 4477);
   const path = argValue(argv, 'file') ?? config.paths.log;
-  if (hasFlag(argv, 'write')) throw new Error('--write arrives with ws-seg3');
-  const writable = false;
+  const writable = hasFlag(argv, 'write');
   // Read on every request, so an edit to the page shows on reload without restarting the server.
   const page = () => readFileSync(new URL('./viewer.html', import.meta.url), 'utf8');
   configureExplainer(argv, path);
@@ -398,6 +518,7 @@ await run('viewer', () => {
       res.end(JSON.stringify(body));
     };
     try {
+      const change = req.url?.match(/^\/api\/claims\/([0-9a-f]{16})\/state$/);
       const url = new URL(req.url ?? '/', 'http://localhost');
       if (url.pathname === '/api/state') {
         const seq = url.searchParams.get('seq');
@@ -405,6 +526,15 @@ await run('viewer', () => {
       } else if (url.pathname === '/api/explain' && req.method === 'POST') {
         const body = JSON.parse(await readBody(req)) as { seq?: unknown; lang?: unknown };
         json(200, await explain(path, Number(body.seq), body.lang === 'en' ? 'en' : 'it'));
+      } else if (change && req.method === 'POST') {
+        if (!writable) return json(403, { error: 'viewer is read-only: start it with npm run viewer -- --write' });
+        const body = JSON.parse(await readBody(req)) as { to?: unknown; note?: unknown; successor?: unknown };
+        if (body.to !== 'verified' && body.to !== 'superseded') throw new Refused('a human can only verify or supersede a claim');
+        json(200, { seqs: changeState(path, change[1]!, {
+          to: body.to,
+          note: typeof body.note === 'string' ? body.note : '',
+          successor: typeof body.successor === 'string' ? body.successor : undefined,
+        }) });
       } else {
         res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
         res.end(page());
@@ -412,5 +542,5 @@ await run('viewer', () => {
     } catch (err) {
       json(err instanceof Refused ? 409 : 500, { error: err instanceof Error ? err.message : String(err) });
     }
-  }).listen(port, '127.0.0.1', () => process.stdout.write(`viewer on http://localhost:${port} (read-only; explain ${API_KEY ? `on, ${EXPLAIN_MODEL}, key from ${KEY_SOURCE}` : 'off: no ANTHROPIC_API_KEY in the environment or a .env'})\n`));
+  }).listen(port, '127.0.0.1', () => process.stdout.write(`viewer on http://localhost:${port} (${writable ? `WRITE MODE on ${path}: not for the live demo` : 'read-only'}; explain ${API_KEY ? `on, ${EXPLAIN_MODEL}, key from ${KEY_SOURCE}` : 'off: no ANTHROPIC_API_KEY in the environment or a .env'})\n`));
 });

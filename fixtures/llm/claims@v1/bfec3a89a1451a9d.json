@@ -1,0 +1,28 @@
+{
+  "extractor": "claims",
+  "version": "v1",
+  "modelId": "claude-<version>",
+  "promptVersion": "p3",
+  "inputHash": "bfec3a89a1451a9d",
+  "request": {
+    "prompt": "Estrai le grandezze del comma: chiave del catalogo, valore come appare nel testo, span locale [start, end).",
+    "unit": {
+      "documentId": "cc-art2477",
+      "version": "v9",
+      "path": "c5",
+      "text": "L'assemblea che approva il bilancio in cui vengono superati i limiti indicati al secondo comma deve provvedere, entro trenta giorni, alla nomina dell'organo di controllo o del revisore. Se l'assemblea non provvede, alla nomina provvede il tribunale su richiesta di qualsiasi soggetto interessato o su segnalazione del conservatore del registro delle imprese."
+    }
+  },
+  "response": {
+    "claims": [
+      {
+        "subjectKey": "assemblea.termine",
+        "value": "trenta giorni",
+        "span": {
+          "start": 112,
+          "end": 131
+        }
+      }
+    ]
+  }
+}

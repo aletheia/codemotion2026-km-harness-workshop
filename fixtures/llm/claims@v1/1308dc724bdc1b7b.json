@@ -1,0 +1,28 @@
+{
+  "extractor": "claims",
+  "version": "v1",
+  "modelId": "claude-<version>",
+  "promptVersion": "p3",
+  "inputHash": "1308dc724bdc1b7b",
+  "request": {
+    "prompt": "Estrai le grandezze del comma: chiave del catalogo, valore come appare nel testo, span locale [start, end).",
+    "unit": {
+      "documentId": "cc-art2477",
+      "version": "v9",
+      "path": "c3",
+      "text": "L'obbligo di nomina dell'organo di controllo o del revisore di cui alla lettera c) del secondo comma cessa quando, per tre esercizi consecutivi, non è superato alcuno dei predetti limiti."
+    }
+  },
+  "response": {
+    "claims": [
+      {
+        "subjectKey": "cessazione.esercizi",
+        "value": "tre esercizi",
+        "span": {
+          "start": 115,
+          "end": 143
+        }
+      }
+    ]
+  }
+}

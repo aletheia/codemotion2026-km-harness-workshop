@@ -65,3 +65,10 @@ export function displayValue(v: NormalizedValue): string {
     default: return String(v.value);
   }
 }
+
+/** Compact form for tables and conflict evidence: "2,000,000", "10", "2", "30 giorni" (days keep the Italian word). */
+export function shortValue(v: NormalizedValue): string {
+  if (v.type === 'money') return v.amount.toLocaleString('en-US');
+  if (v.type === 'integer') return v.unit === 'days' ? `${v.value} giorni` : String(v.value);
+  return displayValue(v);
+}

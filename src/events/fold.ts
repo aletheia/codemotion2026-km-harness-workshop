@@ -25,3 +25,11 @@ export function claimStates(events: readonly LogEvent[]): ReadonlyMap<ClaimId, C
     return states;
   });
 }
+
+/** Throws if the lifecycle table refuses a claim event draft against the log; non-claim events and duplicates pass. */
+export function assertTransition(events: readonly LogEvent[], draft: { eventId: string; type: string }): void {
+  if (!CLAIM_EVENT_TYPES.has(draft.type) || events.some((e) => e.eventId === draft.eventId)) return;
+  const claim = draft as unknown as ClaimEvent;
+  const next = transition(claimStates(events).get(claim.payload.claimId) ?? null, claim);
+  if (isTransitionError(next)) throw new Error(next.reason);
+}

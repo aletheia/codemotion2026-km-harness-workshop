@@ -2,11 +2,10 @@
 import { config } from '../config';
 import { contentHashOf, manifestEntry, readDocument } from '../acl/sourceToStructure';
 import { deriveEventId } from '../events/eventId';
-import { append } from '../events/log';
+import { append, type AppendResult } from '../events/log';
 import { argValue, run } from './cli';
 
-await run('ingest', () => {
-  const version = argValue(process.argv.slice(2), 'version') ?? 'v8';
+export function ingestStep(version: string, path: string = config.paths.log): { fields: string[]; result: AppendResult } {
   const { lineageId, atto, article } = config.source;
   const documentId = lineageId;
   const text = readDocument(documentId, version);
@@ -17,7 +16,7 @@ await run('ingest', () => {
   }
 
   const aggregateId = `${documentId}@${version}`;
-  append(config.paths.log, {
+  const result = append(path, {
     eventId: deriveEventId({
       producer: 'process:ingest', inputArtifactId: contentHash, extractorVersion: null,
       eventType: 'DocumentVersionIngested', aggregateId,
@@ -41,5 +40,12 @@ await run('ingest', () => {
     `lineage=${lineageId}`, `documentId=${documentId}`, `version=${version}`, `hash=${contentHash.slice(0, 'sha256:'.length + 8)}…`,
     `effectiveFrom=${entry.effectiveFrom}`, ...(entry.effectiveTo ? [`effectiveTo=${entry.effectiveTo}`] : []), `length=${text.length}`,
   ];
-  process.stdout.write(`ingest  ${fields.join('  ')}\n`);
-});
+  return { fields, result };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  await run('ingest', () => {
+    const { fields } = ingestStep(argValue(process.argv.slice(2), 'version') ?? 'v8');
+    process.stdout.write(`ingest  ${fields.join('  ')}\n`);
+  });
+}

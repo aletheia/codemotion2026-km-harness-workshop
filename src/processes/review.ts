@@ -1,6 +1,7 @@
 // The reviewer CLI (a process, not an agent). Guided, not free typing: the log says which stage is pending,
 // fixtures/review/decisions.json holds the scripted decisions of that stage, and each decision is shown with
-// its evidence pre-filled (span text, catalogue lookup). Interactive: Enter confirms, n skips, e edits the
+// its evidence pre-filled (span text, catalogue lookup; for a contested pair both claims side by side with
+// their spans and validity periods). Interactive: Enter confirms, n skips, e edits the
 // note. Auto (review:auto, dry-run): the stage is applied without waiting and nothing is printed.
 //
 // A stage is pending when every proposal it decides on is in the log and at least one of its decision
@@ -16,10 +17,8 @@ import { displayValue, normalize } from '../catalog/normalizer';
 import { isCritical, lookupSubject } from '../catalog/subjects';
 import { deriveClaimId, type NormalizedValue, type SubjectKey } from '../domain/claim';
 import { documentId as asDocumentId, lineageId as asLineageId } from '../domain/ids';
-import { isTransitionError, transition } from '../domain/transition';
-import type { ClaimEvent } from '../events/catalogue';
 import { deriveEventId } from '../events/eventId';
-import { claimStates, isClaimEvent } from '../events/fold';
+import { assertTransition } from '../events/fold';
 import { append, readLog, type AppendResult, type EventDraft } from '../events/log';
 import { ingestedVersion, ofType, proposedTree, treeIdOf, verifiedTree } from '../events/lookup';
 import type { LogEvent } from '../events/schema';
@@ -29,6 +28,8 @@ const decisionSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('verify-structure'), treeId: z.string(), note }),
   z.object({ action: z.literal('verify'), claim: z.string(), note }),
   z.object({ action: z.literal('leave'), claim: z.string(), note }),
+  // A contested claim resolved in its favour: verify it, supersede the claim it conflicts with.
+  z.object({ action: z.literal('resolve'), claim: z.string(), supersedes: z.string(), note }),
   z.object({
     action: z.literal('add'), documentId: z.string(), version: z.string(), sectionPath: z.string(), subjectKey: z.string(),
     value: z.string(), span: z.object({ start: z.int(), end: z.int() }), note,
@@ -123,6 +124,64 @@ export function planStage(stage: Stage, events: readonly LogEvent[], reviewer: s
         break;
       }
 
+      case 'resolve': {
+        const next = proposals.get(d.claim);
+        const prev = proposals.get(d.supersedes);
+        // The stage is ready only once compare has contested the new claim: the verification is caused by
+        // the ClaimContested event (← ev-0027), not by the proposal.
+        const contest = next && ofType(events, 'ClaimContested').find((e) => e.payload.claimId === next.payload.claimId);
+        if (!next || !prev || !contest) return undefined;
+        // Each side of the pair: its span and the validity period of the document version it comes from.
+        const validity = (p: typeof next) => {
+          const span = p.payload.spans[0]!;
+          const v = ingestedVersion(events, span.documentId, span.version);
+          return { span, from: v?.payload.effectiveFrom, to: v?.payload.effectiveTo };
+        };
+        const n = validity(next);
+        const o = validity(prev);
+        const side = (label: string, p: typeof next, x: typeof n) =>
+          `      ${label.padEnd(13)} ${x.span.version} [${x.span.start},${x.span.end})  ` +
+          `${quote(readDocument(x.span.documentId, x.span.version).slice(x.span.start, x.span.end), 50)}  ` +
+          `in force ${x.from ?? '?'}${x.to ? ` – ${x.to}` : ' –'}  ${displayValue(p.payload.normalizedValue as NormalizedValue)}`;
+        const verifyId = deriveEventId({ producer, inputArtifactId: contest.eventId, extractorVersion: null, eventType: 'ClaimVerified', aggregateId: next.payload.claimId });
+        planned.push({
+          decision: d,
+          lines: [
+            `resolve  ${d.claim} vs ${d.supersedes}  ${next.payload.subjectKey}  ·  ${catalogueLine(next.payload.subjectKey)}`,
+            side(d.claim, next, n),
+            side(d.supersedes, prev, o),
+            `      → verify ${d.claim}; supersede ${d.supersedes}${n.from ? ` (valid until ${n.from})` : ''}`,
+          ],
+          // Verify first, then supersede: the predecessor is superseded by a claim that is already verified,
+          // and its valid-time end is the successor version's effectiveFrom (2019-06-18).
+          drafts: (text) => [
+            {
+              eventId: verifyId,
+              type: 'ClaimVerified',
+              layer: 'claims',
+              aggregateId: next.payload.claimId,
+              actor,
+              causationId: contest.eventId,
+              correlationId: `review-${stage.id}`,
+              payload: { claimId: next.payload.claimId },
+              evidence: { kind: 'human', note: text },
+            },
+            {
+              eventId: deriveEventId({ producer, inputArtifactId: verifyId, extractorVersion: null, eventType: 'ClaimSuperseded', aggregateId: prev.payload.claimId }),
+              type: 'ClaimSuperseded',
+              layer: 'claims',
+              aggregateId: prev.payload.claimId,
+              actor,
+              causationId: verifyId,
+              correlationId: `review-${stage.id}`,
+              payload: { claimId: prev.payload.claimId, successor: next.payload.claimId },
+              evidence: { reason: 'human-resolution', note: text, ...(n.from ? { validUntil: n.from } : {}) },
+            },
+          ],
+        });
+        break;
+      }
+
       case 'add': {
         const tree = verifiedTree(events, treeIdOf(d.version));
         const ingested = ingestedVersion(events, d.documentId, d.version);
@@ -189,12 +248,7 @@ export function pendingStage(file: DecisionsFile, events: readonly LogEvent[]): 
 /** Appends the events of one decision; a claim event the lifecycle table refuses is never appended. */
 export function applyDecision(path: string, planned: PlannedDecision, note: string): AppendResult[] {
   return planned.drafts(note).map((draft) => {
-    const events = readLog(path);
-    if (isClaimEvent(draft as LogEvent) && !events.some((e) => e.eventId === draft.eventId)) {
-      const claim = draft as unknown as ClaimEvent;
-      const next = transition(claimStates(events).get(claim.payload.claimId) ?? null, claim);
-      if (isTransitionError(next)) throw new Error(next.reason);
-    }
+    assertTransition(readLog(path), draft);
     return append(path, draft);
   });
 }

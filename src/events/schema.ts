@@ -40,7 +40,7 @@ const actorSchemas = {
     promptVersion: nonEmpty,
     extractorVersion: nonEmpty,
   }),
-  harness: z.strictObject({ kind: z.literal('harness'), id: nonEmpty, rule: z.enum(['class-A', 'contest', 'eval', 'gate', 'bootstrap']) }),
+  harness: z.strictObject({ kind: z.literal('harness'), id: nonEmpty, rule: z.enum(['class-A', 'contest', 'eval', 'gate', 'bootstrap', 'catalogue']) }),
   import: z.strictObject({ kind: z.literal('import'), id: nonEmpty, source: nonEmpty }),
   process: z.strictObject({ kind: z.literal('process'), id: z.enum(['ingest', 'log-init', 'acl', 'cursor']) }),
 } as const;
@@ -131,7 +131,8 @@ export const StructureVerified = decision('StructureVerified', 'structure', acto
   z.strictObject({ treeId: nonEmpty }),
   z.discriminatedUnion('kind', [
     evidenceWith('human', { note: nonEmpty, ...treeCheck }),
-    evidenceWith('class-A', { reconfirmedTreeId: nonEmpty, probeResult: z.enum(['passed', 'not-applicable']) }),
+    // reconfirmedEventId: the StructureVerified of the reconfirmed tree (the tail shows it as ev-NNNN).
+    evidenceWith('class-A', { reconfirmedTreeId: nonEmpty, reconfirmedEventId: hex16, probeResult: z.enum(['passed', 'not-applicable']) }),
   ]));
 
 // ---------------------------------------------------------------- claims
@@ -153,7 +154,11 @@ export const ClaimVerified = decision('ClaimVerified', 'claims', actorOf('human'
   z.strictObject({ claimId: hex16 }),
   z.discriminatedUnion('kind', [
     evidenceWith('human', { note: nonEmpty, checkedSpan: spanSchema.optional() }),
-    evidenceWith('class-A', { reconfirmedBeliefId: hex16, batchId: nonEmpty, probeResult: z.enum(['passed', 'not-applicable']) }),
+    // beliefEventId: the decision that made the reconfirmed belief verified; auditSampled: picked for human audit.
+    evidenceWith('class-A', {
+      reconfirmedBeliefId: hex16, beliefEventId: hex16, batchId: nonEmpty,
+      probeResult: z.enum(['passed', 'not-applicable']), auditSampled: z.boolean(),
+    }),
     evidenceWith('import', { sourceRecord: nonEmpty }),
   ]));
 
@@ -167,7 +172,8 @@ export const ClaimContested = decision('ClaimContested', 'claims', actorOf('harn
 
 export const ClaimSuperseded = decision('ClaimSuperseded', 'claims', actorOf('human', 'harness'),
   z.strictObject({ claimId: hex16, successor: hex16 }),
-  z.strictObject({ reason: z.enum(['human-resolution', 'reconfirmation-chain']), note: z.string().optional() }));
+  // validUntil: the valid-time end of the superseded claim (the successor's effectiveFrom), on a human resolution.
+  z.strictObject({ reason: z.enum(['human-resolution', 'reconfirmation-chain']), note: z.string().optional(), validUntil: isoDate.optional() }));
 
 // ---------------------------------------------------------------- entities
 export const EntityProposed = fact('EntityProposed', 'entities', actorOf('agent'),
@@ -175,7 +181,7 @@ export const EntityProposed = fact('EntityProposed', 'entities', actorOf('agent'
 
 export const EntityResolved = decision('EntityResolved', 'entities', actorOf('human', 'harness'),
   z.strictObject({ claimId: hex16, entityId: nonEmpty }),
-  z.discriminatedUnion('kind', [humanNote, evidenceWith('catalogue-lookup', { catalogueEntry: nonEmpty })]));
+  z.discriminatedUnion('kind', [humanNote, evidenceWith('catalogue-lookup', { mention: nonEmpty, catalogueEntry: nonEmpty })]));
 
 export const EntityMerged = decision('EntityMerged', 'entities', actorOf('human'),
   z.strictObject({ survivingId: nonEmpty, mergedIds: z.array(nonEmpty).min(1) }),
@@ -194,8 +200,10 @@ export const PolicyProposed = fact('PolicyProposed', 'policies', actorOf('agent'
     applicability: applicabilitySchema,
   }));
 
+// The reviewer of a policy checks the triple: the evidence restates condition, effect and exception as read.
 export const PolicyVerified = decision('PolicyVerified', 'policies', actorOf('human'),
-  z.strictObject({ policyId: nonEmpty }), humanNote);
+  z.strictObject({ policyId: nonEmpty }),
+  z.discriminatedUnion('kind', [humanNote, evidenceWith('policy-review', { condition: nonEmpty, effect: nonEmpty, exception: nonEmpty.optional() })]));
 
 export const PolicyContested = decision('PolicyContested', 'policies', actorOf('harness'),
   z.strictObject({ policyId: nonEmpty, conflictingPolicyId: nonEmpty }),
