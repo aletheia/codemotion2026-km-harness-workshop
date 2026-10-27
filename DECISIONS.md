@@ -39,8 +39,8 @@ Defaults chosen where the brief left a choice open. Change them here first, then
 - The seg1 retriever computes hashed n-gram TF-IDF cosine at query time. This deviates from the brief's
   "pre-computed vectors": nothing neural is stored, so nothing can be mistaken for a measured embedding result.
 - The batch gate's `rejected` path is pure and unit-tested only. No `BatchRejected` event type exists, so the app
-  never emits one; until the seg5 `eval` module supplies a probe, the app refuses (exit 2) to compare when the
-  golden set holds 10 or more expected items.
+  never emits one. Online probes against production batches are NOT built (there are none here), so the app
+  refuses (exit 2) to compare when the golden set holds 10 or more expected items, rather than pretend to probe.
 - A golden claim item takes the human's reviewed span if there is one, else the claim's first-proposal span.
 - Default `eval` golden cut-off: the sequence number after seg2's last review (seq 15), i.e. before the second
   edition is ingested.
@@ -51,3 +51,9 @@ Defaults chosen where the brief left a choice open. Change them here first, then
 - `log-cat --chain superseded` follows `causationId` back from the first `ClaimSuperseded` event.
 - `replay --extractor X` replays recorded responses for Article 12 of every ingested document; it needs a verified
   structure and a recording for each document, otherwise it fails loudly (exit 2).
+- `eval` and `drift` are read-only queries: they append nothing. They evaluate per expected item (aligned by document
+  and subject key, highest IoU wins) and only for documents that have golden items, so the 2025 proposals of an
+  extractor are not scored against the 2024 golden set.
+- Promotion is a human decision and has no command: `drift` prints the four criteria and which ones fail, and states
+  that no `ExtractorVersionPromoted` event is emitted. The "critical subset" for criterion 3 is the subject keys
+  whose class is monetary, exclusion or time-limit (`config.criticalClasses`).

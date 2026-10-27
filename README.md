@@ -48,6 +48,8 @@ History on `main` is linear, one commit per step. `npm run tags` creates **annot
 | `npm run seg3 -- <ingest\|extract\|compare\|review\|layers-4-6>` | segment 3: second edition, comparator classes A/B/C |
 | `npm run seg4 -- <log-cat\|projections-drop\|projections-build\|projections-diff\|beliefs\|replay>` | segment 4: the log as source of truth |
 | `npm run log-cat`, `npm run beliefs`, `npm run projections-drop`, `npm run projections-build`, `npm run projections-diff` | the same commands without the `seg4 --` prefix |
+| `npm run seg5 -- <golden\|eval\|drift>` | segment 5: the golden set, per-item evaluation, drift between extractor versions |
+| `npm run golden`, `npm run eval`, `npm run drift` | the same commands without the `seg5 --` prefix |
 | `npm run replay -- --extractor claims@v2` | replay recorded responses of another extractor version: appends `ClaimProposed` only |
 | `npm run compare` | the comparator on its own (same as `seg3 compare`) |
 | `npm run unit -- --doc cp-2024` | the extraction unit the ACL hands to an extractor |

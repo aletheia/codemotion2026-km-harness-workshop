@@ -13,4 +13,10 @@ A recorded session is the only thing that shows the agent's behaviour. Nothing i
 
 ## What is already here
 
-- Nothing yet: segment 5 is not part of this checkout. See `git tag -l`.
+- `expected-output.txt`: the **deterministic tool output, not a model session**: exactly what the `npm run`
+  commands of segment 5 print when replayed from `fixtures/llm` in a clean checkout. A test fails if it is
+  out of date; regenerate with `npm run dry-run -- --write-fallback`.
+- `golden-claims.txt`: the golden set at the seg2 cut-off (four items)
+- `eval-v1.txt`: per-item evaluation of claims@v1: TP 2, FP 2, FN 2
+- `eval-v2-summary.txt`: claims@v2 summary after the replay
+- `drift-v1-v2.txt`: drift between the two versions, criteria 1 and 3 failed

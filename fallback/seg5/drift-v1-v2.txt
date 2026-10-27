@@ -1,0 +1,24 @@
+# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
+# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
+# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
+$ npm run drift -- --from claims@v1 --to claims@v2 --text
+
+drift claims@v1 -> claims@v2 on golden set claims@15 (per item; aggregates are not compared)
+  aggregate: precision 0.50 -> 0.60, recall 0.50 -> 0.75 (TP/FP/FN 2/2/2 -> 3/2/1)
+
+  item                 claims@v1                claims@v2                cell
+  fire.deductible      correct 500 EUR          correct 500 EUR          STABLE
+  theft.deductible     correct 250 EUR          wrong 2.500 EUR          REGRESSION  (monetary: critical subset)
+  theft.coinsurance    wrong 15%                correct 10 %             IMPROVEMENT
+  liability.limit      not proposed             correct 1.000.000 EUR    IMPROVEMENT
+
+  noise in claims@v2 (proposals with no expected item): theft.limit = 5.000 EUR (new)
+  provenance drift on value-correct items: fire.deductible IoU 0.95 -> 1.00
+
+  promotion criteria (all four must hold):
+    1. precision on the layer: FAILED (precision 0.60 vs threshold 0.90)
+    2. recall does not drop: met (recall 0.75 vs 0.50 - 0.02)
+    3. zero regressions on the critical subset: FAILED (regressions: theft.deductible)
+    4. wrong provenance on value-correct pairs: met (0 of 3 value-correct pairs (limit 2 %))
+
+  criteria failed: [1, 3]. claims@v2 is NOT promoted: no ExtractorVersionPromoted event is emitted; its proposals stay in the log as a candidate nobody consumes.

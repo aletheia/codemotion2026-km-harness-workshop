@@ -6,6 +6,8 @@ import { projectionsBuild, projectionsDrop } from '../../src/app/projections';
 import { projectionsDiff, renderDiff } from '../../src/app/projectionsDiff';
 import { queryBeliefs, renderBeliefs } from '../../src/app/beliefs';
 import { readAll } from '../../src/adapters/eventLog';
+import { driftQuery, evalExtractor, golden, renderDrift, renderEval, renderGolden } from '../../src/app/evaluate';
+import { loadFold } from '../../src/app/context';
 import { editionByDocumentId } from '../../src/adapters/documents';
 import { repoPath } from '../../src/adapters/paths';
 import { compareDocument, reconfirmStructure } from '../../src/app/compare';
@@ -91,4 +93,29 @@ export function cmdBeliefs(args: Args, command: string): void {
   const seq = flag(args, 'seq');
   const r = queryBeliefs({ at: flag(args, 'at'), seq: seq === undefined ? undefined : Number(seq) });
   emit(command, r as unknown as Record<string, unknown>, renderBeliefs(r), args);
+}
+
+// ---- segment 5 ----
+
+export function cmdGolden(args: Args, command: string): void {
+  const r = golden({ layer: flag(args, 'layer') ?? 'claims', until: flag(args, 'until') });
+  emit(command, r as unknown as Record<string, unknown>, renderGolden(r), args);
+}
+
+export function cmdEval(args: Args, command: string): void {
+  const extractor = flag(args, 'extractor');
+  if (!extractor) throw new UsageError('missing --extractor (for example claims@v1)');
+  const o = evalExtractor(loadFold(), extractor, flag(args, 'until'));
+  const data = args.flags.summary
+    ? { extractor: o.extractor, goldenVersion: o.goldenVersion, expectedItems: o.expectedItems, tp: o.result.tp, fp: o.result.fp, fn: o.result.fn, precision: o.result.precision, recall: o.result.recall }
+    : (o as unknown as Record<string, unknown>);
+  emit(command, data, renderEval(o, Boolean(args.flags.summary)), args);
+}
+
+export function cmdDrift(args: Args, command: string): void {
+  const from = flag(args, 'from');
+  const to = flag(args, 'to');
+  if (!from || !to) throw new UsageError('usage: drift --from claims@v1 --to claims@v2 [--until N]');
+  const o = driftQuery(from, to, flag(args, 'until'));
+  emit(command, o as unknown as Record<string, unknown>, renderDrift(o), args);
 }

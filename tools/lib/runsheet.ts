@@ -45,4 +45,9 @@ export const steps: Step[] = [
   { segment: 4, npm: 'npm run beliefs -- --at 2024-03-01 --text', tool: 'beliefs', args: ['--at', '2024-03-01', '--text'], expectExit: 0, fallback: 'beliefs-at-2024-03-01.txt', note: 'valid time' },
   { segment: 4, npm: 'npm run beliefs -- --text', tool: 'beliefs', args: ['--text'], expectExit: 0 },
   { segment: 4, npm: 'npm run beliefs -- --seq 15 --text', tool: 'beliefs', args: ['--seq', '15', '--text'], expectExit: 0, note: 'transaction time: the log as it was after event 15' },
+  { segment: 5, npm: 'npm run golden -- --layer claims --until 15 --text', tool: 'golden', args: ['--layer', 'claims', '--until', '15', '--text'], expectExit: 0, fallback: 'golden-claims.txt', note: 'the four expected items of Article 12 (2024), cut off after segment 2' },
+  { segment: 5, npm: 'npm run golden -- --layer claims --text', tool: 'golden', args: ['--layer', 'claims', '--text'], expectExit: 0, note: 'without a cut-off: five items, the fifth is the human resolution of the 750 conflict' },
+  { segment: 5, npm: 'npm run eval -- --extractor claims@v1 --text', tool: 'eval', args: ['--extractor', 'claims@v1', '--text'], expectExit: 0, fallback: 'eval-v1.txt' },
+  { segment: 5, npm: 'npm run eval -- --extractor claims@v2 --summary --text', tool: 'eval', args: ['--extractor', 'claims@v2', '--summary', '--text'], expectExit: 0, fallback: 'eval-v2-summary.txt' },
+  { segment: 5, npm: 'npm run drift -- --from claims@v1 --to claims@v2 --text', tool: 'drift', args: ['--from', 'claims@v1', '--to', 'claims@v2', '--text'], expectExit: 0, fallback: 'drift-v1-v2.txt' },
 ];

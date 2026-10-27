@@ -12,6 +12,8 @@ export interface RecordingFile<O> {
   extractor: string; // e.g. "claims@v1"
   modelId: string; // "fixture-replay": there is no model behind these responses
   promptVersion: string;
+  /** Golden item ids that appear as examples in this extractor's prompt: subtracted from its probes and evals. */
+  promptExampleIds?: string[];
   responses: RecordedResponse<O>[];
 }
 
