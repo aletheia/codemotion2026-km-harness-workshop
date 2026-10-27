@@ -1,0 +1,56 @@
+{
+  "name": "dnk-workshop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Documents Are Not Knowledge — event-sourced knowledge extraction on art. 2477 c.c. (Codemotion Milan 2026). Offline, fixture-replayed.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "rag:index": "tsx src/tools/not-implemented.ts rag:index F",
+    "rag:query": "tsx src/tools/not-implemented.ts rag:query F",
+    "rag:delete-v8": "tsx src/tools/not-implemented.ts rag:delete-v8 F",
+    "rag:extract-c2": "tsx src/tools/not-implemented.ts rag:extract-c2 F",
+    "log:reset": "tsx src/tools/log-reset.ts",
+    "log:init": "tsx src/tools/log-init.ts",
+    "ingest:v8": "tsx src/tools/not-implemented.ts ingest:v8 B",
+    "extract:structure-v8": "tsx src/tools/not-implemented.ts extract:structure-v8 B",
+    "review": "tsx src/tools/not-implemented.ts review B",
+    "review:auto": "tsx src/tools/not-implemented.ts review:auto B",
+    "extract:claims-v8": "tsx src/tools/not-implemented.ts extract:claims-v8 B",
+    "show:ricavi-v8": "tsx src/tools/not-implemented.ts show:ricavi-v8 B",
+    "show": "tsx src/tools/not-implemented.ts show B",
+    "ingest:v9": "tsx src/tools/not-implemented.ts ingest:v9 C",
+    "extract:v9": "tsx src/tools/not-implemented.ts extract:v9 C",
+    "compare": "tsx src/tools/not-implemented.ts compare C",
+    "layers-4-6": "tsx src/tools/not-implemented.ts layers-4-6 C",
+    "log:cat": "tsx src/tools/log-cat.ts",
+    "projections:drop": "tsx src/tools/not-implemented.ts projections:drop D",
+    "projections:build": "tsx src/tools/not-implemented.ts projections:build D",
+    "replay:claims-v2": "tsx src/tools/not-implemented.ts replay:claims-v2 D",
+    "projections:diff": "tsx src/tools/not-implemented.ts projections:diff D",
+    "beliefs:at-2019-04-30": "tsx src/tools/not-implemented.ts beliefs:at-2019-04-30 D",
+    "beliefs": "tsx src/tools/not-implemented.ts beliefs D",
+    "golden:claims-until-seg2": "tsx src/tools/not-implemented.ts golden:claims-until-seg2 E",
+    "golden:claims": "tsx src/tools/not-implemented.ts golden:claims E",
+    "eval:claims-v1": "tsx src/tools/not-implemented.ts eval:claims-v1 E",
+    "eval:claims-v2-summary": "tsx src/tools/not-implemented.ts eval:claims-v2-summary E",
+    "drift:v1-v2": "tsx src/tools/not-implemented.ts drift:v1-v2 E",
+    "ask:ricavi-2019-04-30": "tsx src/tools/not-implemented.ts ask:ricavi-2019-04-30 E",
+    "ask:ricavi": "tsx src/tools/not-implemented.ts ask:ricavi E",
+    "tail": "tsx src/tools/tail.ts",
+    "dry-run": "tsx src/tools/not-implemented.ts dry-run F",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
