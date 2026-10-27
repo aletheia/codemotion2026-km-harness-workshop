@@ -1,0 +1,47 @@
+# fallback/seg6/expected-output.txt
+# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
+# It is what the npm commands print when replayed from fixtures/llm in a clean checkout.
+# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
+
+$ npm run ask -- --q "franchigia incendio" --as-of 2024-03-01 --text
+ask  "franchigia incendio"  as-of=2024-03-01  policy: monetary → human-rooted verified only
+subject: fire.deductible (Franchigia incendio); edition cp-2024@2024, in force 2024-01-01 → 2025-01-01
+answer: 500 EUR
+  belief   f011ef24  verified by human:luca at seq 10
+  evidence span cp-2024@2024 [4240,4280)  "Incendio: franchigia di 500 EUR a evento"  (proposed span [4238,4280); the verified span is the reviewer's)
+  superseded later by 53a92970 (750 EUR, seq 33) — not applicable on 2024-03-01
+log read through seq 44; sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read
+[exit 0]
+
+$ npm run ask -- --q "franchigia incendio" --text
+ask  "franchigia incendio"  as-of=now  policy: monetary → human-rooted verified only
+subject: fire.deductible (Franchigia incendio); edition cp-2025@2025, in force 2025-01-01 → open
+answer: 750 EUR
+  belief   53a92970  verified by human:luca at seq 32 after ClaimContested seq 25   successor of f011ef24
+  evidence span cp-2025@2025 [4300,4340)  "Incendio: franchigia di 750 EUR a evento"  (proposed span [4298,4340); the verified span is the reviewer's)
+log read through seq 44; sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read
+[exit 0]
+
+$ npm run ask -- --q "franchigia furto" --text    # harness-verified with a human root: usable under the policy
+ask  "franchigia furto"  as-of=now  policy: monetary → human-rooted verified only
+subject: theft.deductible (Franchigia furto); edition cp-2025@2025, in force 2025-01-01 → open
+answer: 250 EUR
+  belief   d302aaa8  verified by harness:comparator at seq 26   successor of 9294bff5
+  chain    class-A reconfirmation by the harness; root: human:luca at seq 11; d302aaa8 → 9294bff5
+  evidence span cp-2025@2025 [4341,4380)  "Furto: franchigia di 250 EUR a sinistro"
+log read through seq 44; sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read
+[exit 0]
+
+$ npm run ask -- --q "franchigia grandine" --text    # still proposed: the agent cannot assert it
+ask  "franchigia grandine"  as-of=now  policy: monetary → human-rooted verified only
+subject: hail.deductible (Franchigia grandine); edition cp-2025@2025, in force 2025-01-01 → open
+answer: none. The agent cannot assert this.
+  reason: proposed: nobody has decided it yet, it waits in the review queue
+  on record: 300 EUR, claim a99f694f, state proposed (not an answer)
+log read through seq 44; sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read
+[exit 0]
+
+$ npm run ask -- --q "franchigia terremoto" --text    # not in the catalogue: rejected
+[stderr]
+error: no subject in the catalogue matches "franchigia terremoto" (known: "franchigia incendio", "franchigia furto", "scoperto furto", "massimale responsabilità civile", "franchigia grandine", "scoperto eventi atmosferici")
+[exit 2]

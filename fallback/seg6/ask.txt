@@ -1,0 +1,12 @@
+# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
+# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
+# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
+$ npm run ask -- --q "franchigia incendio" --as-of 2024-03-01 --text
+
+ask  "franchigia incendio"  as-of=2024-03-01  policy: monetary → human-rooted verified only
+subject: fire.deductible (Franchigia incendio); edition cp-2024@2024, in force 2024-01-01 → 2025-01-01
+answer: 500 EUR
+  belief   f011ef24  verified by human:luca at seq 10
+  evidence span cp-2024@2024 [4240,4280)  "Incendio: franchigia di 500 EUR a evento"  (proposed span [4238,4280); the verified span is the reviewer's)
+  superseded later by 53a92970 (750 EUR, seq 33) — not applicable on 2024-03-01
+log read through seq 44; sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read

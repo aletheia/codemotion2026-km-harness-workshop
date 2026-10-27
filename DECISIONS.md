@@ -57,3 +57,16 @@ Defaults chosen where the brief left a choice open. Change them here first, then
 - Promotion is a human decision and has no command: `drift` prints the four criteria and which ones fail, and states
   that no `ExtractorVersionPromoted` event is emitted. The "critical subset" for criterion 3 is the subject keys
   whose class is monetary, exclusion or time-limit (`config.criticalClasses`).
+- `ask` resolves the question to one catalogue subject by its label (every word of at least four letters, accents and
+  case ignored) or by its subject key. It is not a language model: a question that names no catalogue subject is
+  rejected (exit 2) with the catalogue listed. With several claims on one subject in one edition it answers from the
+  verified one (a hand-added human claim beats a wrong proposal) and lists the others.
+- `ask` cites the reviewer's span when a human reviewed the claim (that span is what the golden set holds), and
+  prints the proposed span next to it when the two differ. The quote is the one stored on the claim, i.e. the
+  proposal's, so it can be a few characters wider than the verified span.
+- Consumption policy (`src/domain/consumption.ts`), as in handbook 7.2: proposed and contested are never an answer;
+  monetary, exclusion and time-limit subjects need a human at the root of the evidence chain; other subjects accept
+  a human or harness verification. A refusal is a normal answer (exit 0, `answerable:false`), not an error.
+- Seq numbers in `ask` output are those of this log (44 events at the end of the segment 4 flow), not the `ev-00NN`
+  numbers drawn in the walkthrough script, which are illustrative.
+

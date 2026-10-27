@@ -49,6 +49,7 @@ History on `main` is linear, one commit per step. `npm run tags` creates **annot
 | `npm run seg4 -- <log-cat\|projections-drop\|projections-build\|projections-diff\|beliefs\|replay>` | segment 4: the log as source of truth |
 | `npm run log-cat`, `npm run beliefs`, `npm run projections-drop`, `npm run projections-build`, `npm run projections-diff` | the same commands without the `seg4 --` prefix |
 | `npm run seg5 -- <golden\|eval\|drift>` | segment 5: the golden set, per-item evaluation, drift between extractor versions |
+| `npm run seg6 -- ask --q "franchigia incendio" [--as-of 2024-03-01]`, `npm run ask` | segment 6: an answer from the projection that cites the belief; `--as-of` is valid time; the consumption policy is applied to the root of the evidence chain |
 | `npm run golden`, `npm run eval`, `npm run drift` | the same commands without the `seg5 --` prefix |
 | `npm run replay -- --extractor claims@v2` | replay recorded responses of another extractor version: appends `ClaimProposed` only |
 | `npm run compare` | the comparator on its own (same as `seg3 compare`) |

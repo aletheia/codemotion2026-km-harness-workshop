@@ -7,6 +7,7 @@ import { projectionsDiff, renderDiff } from '../../src/app/projectionsDiff';
 import { queryBeliefs, renderBeliefs } from '../../src/app/beliefs';
 import { readAll } from '../../src/adapters/eventLog';
 import { driftQuery, evalExtractor, golden, renderDrift, renderEval, renderGolden } from '../../src/app/evaluate';
+import { ask, renderAsk } from '../../src/app/ask';
 import { loadFold } from '../../src/app/context';
 import { editionByDocumentId } from '../../src/adapters/documents';
 import { repoPath } from '../../src/adapters/paths';
@@ -118,4 +119,13 @@ export function cmdDrift(args: Args, command: string): void {
   if (!from || !to) throw new UsageError('usage: drift --from claims@v1 --to claims@v2 [--until N]');
   const o = driftQuery(from, to, flag(args, 'until'));
   emit(command, o as unknown as Record<string, unknown>, renderDrift(o), args);
+}
+
+// ---- segment 6 ----
+
+export function cmdAsk(args: Args, command: string): void {
+  const q = flag(args, 'q');
+  if (!q) throw new UsageError('missing --q "<question>" (for example --q "franchigia incendio")');
+  const r = ask(q, flag(args, 'as-of'));
+  emit(command, r as unknown as Record<string, unknown>, renderAsk(r), args);
 }

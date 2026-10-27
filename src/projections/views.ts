@@ -42,7 +42,7 @@ export function traceRoot(f: Fold, rec: ClaimRec): { chain: string[]; root: Root
   return { chain, root: 'harness-only', rootActor: null };
 }
 
-function toBelief(f: Fold, rec: ClaimRec): Belief {
+export function toBelief(f: Fold, rec: ClaimRec): Belief {
   const verification = lastVerification(rec);
   if (!verification) throw new BeliefInvariantError(`claim ${rec.claim.claimId} is verified without a ClaimVerified decision`);
   return { lineageId: rec.claim.lineageId, subjectKey: rec.claim.subjectKey, rec, verification, verifiedBy: verification.actor, ...traceRoot(f, rec) };

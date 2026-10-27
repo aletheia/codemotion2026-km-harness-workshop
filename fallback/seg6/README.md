@@ -13,4 +13,10 @@ A recorded session is the only thing that shows the agent's behaviour. Nothing i
 
 ## What is already here
 
-- Nothing yet: segment 6 is not part of this checkout. See `git tag -l`.
+- `expected-output.txt`: the **deterministic tool output, not a model session**: exactly what the `npm run`
+  commands of segment 6 print when replayed from `fixtures/llm` in a clean checkout. A test fails if it is
+  out of date; regenerate with `npm run dry-run -- --write-fallback`.
+- `ask.txt`: the run-sheet command: fire deductible as of 2024-03-01 (500 EUR)
+- `ask-now.txt`: the same question without a date (750 EUR)
+- `ask-theft.txt`: Theft deductible 2025: usable, harness-verified with a human root
+- `ask-hail.txt`: Hail deductible 2025: still proposed, the agent cannot assert it

@@ -21,6 +21,8 @@
     "seg3": "tsx tools/seg3.ts",
     "seg4": "tsx tools/seg4.ts",
     "seg5": "tsx tools/seg5.ts",
+    "seg6": "tsx tools/seg6.ts",
+    "ask": "tsx tools/ask.ts",
     "compare": "tsx tools/compare.ts",
     "golden": "tsx tools/golden.ts",
     "eval": "tsx tools/eval.ts",

@@ -34,6 +34,7 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 | `npm run seg3 -- <sub>` | Segment 3: `ingest`, `extract --layers structure,claims`, `compare`, `review --auto`, `layers-4-6` (pre-computed excerpt). |
 | `npm run seg4 -- <sub>` | Segment 4: `log-cat`, `projections-drop`, `projections-build`, `projections-diff`, `beliefs`, `replay --extractor claims@v2`. |
 | `npm run seg5 -- <sub>` | Segment 5: `golden`, `eval`, `drift` (read-only over the log). |
+| `npm run seg6 -- ask ...` / `npm run ask -- --q "franchigia incendio" [--as-of YYYY-MM-DD]` | Segment 6: answer from the projection only, citing the belief id, actor, evidence span and edition. `--as-of` is VALID time. Applies the consumption policy to the root of the evidence chain: a proposed or contested belief is never an answer; monetary subjects need a human root. Read-only. |
 | `npm run golden [-- --layer claims\|structure --until N]` | The golden set: human `ClaimVerified` events up to `--until` (default: the cut-off after seg2, seq 15), harness/import decisions and prompt examples excluded. |
 | `npm run eval -- --extractor claims@v1 [--summary]` | Per-item TP/FP/FN, precision and recall of one extractor version against the golden set (IoU threshold 0.8). Read-only. Run `replay --extractor` first for a version with no proposals. |
 | `npm run drift -- --from claims@v1 --to claims@v2` | Per item: stable, regression, improvement, stable-wrong; the noise list; the four promotion criteria. Never promotes: promotion is a human decision. |
@@ -49,7 +50,6 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 | `npm run fixtures` | Regenerates `fixtures/` (a test fails if they differ from the committed ones). |
 | `npm test`, `npm run typecheck` | Test suite and type check. |
 
-More commands appear in the last commit (seg6, ask).
 
 ## Glossary (defined once)
 

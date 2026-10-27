@@ -50,4 +50,9 @@ export const steps: Step[] = [
   { segment: 5, npm: 'npm run eval -- --extractor claims@v1 --text', tool: 'eval', args: ['--extractor', 'claims@v1', '--text'], expectExit: 0, fallback: 'eval-v1.txt' },
   { segment: 5, npm: 'npm run eval -- --extractor claims@v2 --summary --text', tool: 'eval', args: ['--extractor', 'claims@v2', '--summary', '--text'], expectExit: 0, fallback: 'eval-v2-summary.txt' },
   { segment: 5, npm: 'npm run drift -- --from claims@v1 --to claims@v2 --text', tool: 'drift', args: ['--from', 'claims@v1', '--to', 'claims@v2', '--text'], expectExit: 0, fallback: 'drift-v1-v2.txt' },
+  { segment: 6, npm: 'npm run ask -- --q "franchigia incendio" --as-of 2024-03-01 --text', tool: 'ask', args: ['--q', 'franchigia incendio', '--as-of', '2024-03-01', '--text'], expectExit: 0, fallback: 'ask.txt' },
+  { segment: 6, npm: 'npm run ask -- --q "franchigia incendio" --text', tool: 'ask', args: ['--q', 'franchigia incendio', '--text'], expectExit: 0, fallback: 'ask-now.txt' },
+  { segment: 6, npm: 'npm run ask -- --q "franchigia furto" --text', tool: 'ask', args: ['--q', 'franchigia furto', '--text'], expectExit: 0, fallback: 'ask-theft.txt', note: 'harness-verified with a human root: usable under the policy' },
+  { segment: 6, npm: 'npm run ask -- --q "franchigia grandine" --text', tool: 'ask', args: ['--q', 'franchigia grandine', '--text'], expectExit: 0, fallback: 'ask-hail.txt', note: 'still proposed: the agent cannot assert it' },
+  { segment: 6, npm: 'npm run ask -- --q "franchigia terremoto" --text', tool: 'ask', args: ['--q', 'franchigia terremoto', '--text'], expectExit: 2, note: 'not in the catalogue: rejected' },
 ];
