@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { listTs, read, root } from './helpers';
 
 // Import direction. Pure layers know nothing about adapters, app or tools; app may use adapters; tools use app.
-const PURE = ['src/domain', 'src/events', 'src/catalog', 'src/acl', 'src/projections', 'src/agents', 'src/fixtures-gen'];
+const PURE = ['src/domain', 'src/events', 'src/catalog', 'src/acl', 'src/projections', 'src/agents', 'src/fixtures-gen', 'src/rag'];
 const PURE_FILES = ['src/config.ts'];
 const IMPORT = /(?:^|\n)\s*(?:import|export)\s[^;]*?from\s+['"]([^'"]+)['"]|(?:^|\n)\s*import\s+['"]([^'"]+)['"]|\bimport\(\s*['"]([^'"]+)['"]\s*\)/g;
 

@@ -13,4 +13,9 @@ A recorded session is the only thing that shows the agent's behaviour. Nothing i
 
 ## What is already here
 
-- Nothing yet: segment 1 is not part of this checkout. See `git tag -l`.
+- `expected-output.txt`: the **deterministic tool output, not a model session**: exactly what the `npm run`
+  commands of segment 1 print when replayed from `fixtures/llm` in a clean checkout. A test fails if it is
+  out of date; regenerate with `npm run dry-run -- --write-fallback`.
+- `rag-query.txt`: the run-sheet fallback for the first query (two chunks, 500 and 750 EUR).
+- `rag-after-delete.txt`: the same query after `seg1 delete --edition 2024` (one result).
+- `rag-extract.txt`: the one-shot blob (a recorded response, no model call).

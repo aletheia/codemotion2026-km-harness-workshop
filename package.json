@@ -16,6 +16,7 @@
     "propose": "tsx tools/propose.ts",
     "replay": "tsx tools/replay.ts",
     "tail": "tsx tools/tail.ts",
+    "seg1": "tsx tools/seg1.ts",
     "seg2": "tsx tools/seg2.ts",
     "fixtures": "tsx tools/generate-fixtures.ts",
     "tags": "tsx tools/tags.ts",

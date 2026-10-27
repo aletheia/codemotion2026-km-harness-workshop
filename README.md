@@ -43,6 +43,7 @@ History on `main` is linear, one commit per step. `npm run tags` creates **annot
 |---|---|
 | `npm run doctor` | Node version, deps, required files, generated copies in sync |
 | `npm run reset` | clean demo state (empties `events/`, `projections/`); not pre-granted to the agent |
+| `npm run seg1 -- <query\|delete\|extract\|index>` | segment 1: the retrieval baseline that loses identity, provenance and time (hashed n-gram TF-IDF scores, not a neural embedding) |
 | `npm run seg2 -- <log-init\|ingest\|extract\|review\|show>` | segment 2: build the log by hand |
 | `npm run unit -- --doc cp-2024` | the extraction unit the ACL hands to an extractor |
 | `npm run propose -- --file f.json` | agent write path; provenance enforced inside; exit 2 on rejection |

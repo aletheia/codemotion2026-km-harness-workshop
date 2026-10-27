@@ -10,7 +10,7 @@ import { Rejection } from '../src/app/errors';
 import { emit, parseArgs, run } from './lib/cli';
 import { steps } from './lib/runsheet';
 
-export interface Recorded { npm: string; exit: number; stdout: string; stderr: string; note?: string }
+export interface Recorded { npm: string; exit: number; stdout: string; stderr: string; note?: string; fallback?: string }
 
 export function execute(): Map<number, Recorded[]> {
   const dir = makeTempDir('dry-run-');
@@ -26,7 +26,7 @@ export function execute(): Map<number, Recorded[]> {
         args = args.map((a) => (a === '$FILE' ? f : a));
       }
       const r = spawnSync(join(repoRoot, 'node_modules', '.bin', 'tsx'), [join(repoRoot, 'tools', `${s.tool}.ts`), ...args], { cwd: repoRoot, env, encoding: 'utf8' });
-      const rec: Recorded = { npm: s.npm, exit: r.status ?? -1, stdout: r.stdout.replaceAll(dir, '<tmp>'), stderr: r.stderr.replaceAll(dir, '<tmp>'), ...(s.note ? { note: s.note } : {}) };
+      const rec: Recorded = { npm: s.npm, exit: r.status ?? -1, stdout: r.stdout.replaceAll(dir, '<tmp>'), stderr: r.stderr.replaceAll(dir, '<tmp>'), ...(s.note ? { note: s.note } : {}), ...(s.fallback ? { fallback: s.fallback } : {}) };
       (out.get(s.segment) ?? out.set(s.segment, []).get(s.segment)!).push(rec);
       if (rec.exit !== s.expectExit) throw new Rejection(`dry-run: "${s.npm}" exited ${rec.exit}, expected ${s.expectExit}: ${rec.stderr.trim().split('\n').pop() ?? ''}`);
     }
@@ -34,6 +34,18 @@ export function execute(): Map<number, Recorded[]> {
     removeTree(dir);
   }
   return out;
+}
+
+const LABEL = [
+  '# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.',
+  '# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.',
+  '# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)',
+];
+
+/** One run-sheet-named fallback file: the stdout of a single step. .jsonl files stay raw (one event per line). */
+export function renderNamed(rec: Recorded): string {
+  if (rec.fallback?.endsWith('.jsonl')) return rec.stdout;
+  return [...LABEL, `$ ${rec.npm}`, '', rec.stdout.trimEnd(), ''].join('\n');
 }
 
 export function renderFallback(segment: number, recs: Recorded[]): string {
@@ -64,6 +76,12 @@ if (process.argv[1]?.endsWith('dry-run.ts')) {
         const rel = `fallback/seg${seg}/expected-output.txt`;
         writeTextFile(repoPath(rel), renderFallback(seg, recs));
         written.push(rel);
+        for (const r of recs) {
+          if (!r.fallback) continue;
+          const named = `fallback/seg${seg}/${r.fallback}`;
+          writeTextFile(repoPath(named), renderNamed(r));
+          written.push(named);
+        }
       }
     }
     const summary = [...all].map(([seg, recs]) => ({ segment: seg, steps: recs.length, exits: recs.map((r) => r.exit) }));

@@ -25,6 +25,8 @@ export const config = {
     importRooted: 0.2,
     belowProbeMinimum: 1.0, // DECISIONS.md #1: 100 % while the gate is not applicable
   },
+  /** Segment 1 retriever: illustrative display settings, not tuned on anything. */
+  rag: { topK: 3, minScore: 0.5 },
   /** Critical subset: subject-key classes whose regressions block promotion. */
   criticalClasses: ['monetary', 'exclusion', 'time-limit'] as const,
   /**

@@ -1,7 +1,8 @@
 // The deterministic command sequence of each segment, as `npm run` commands. Used by `npm run dry-run`
 // (full rehearsal in a temp directory) and to regenerate fallback/segN/expected-output.txt.
 // Nothing here calls a model: extractors replay fixtures/llm.
-export interface Step { segment: number; npm: string; tool: string; args: string[]; expectExit: number; note?: string; writeFile?: { name: string; content: string } }
+export interface Step { segment: number; npm: string; tool: string; args: string[]; expectExit: number; note?: string; writeFile?: { name: string; content: string };
+  /** Also write this step's stdout to fallback/segN/<name> (the file name the run sheet points at). */ fallback?: string }
 
 const bad = JSON.stringify({
   unitId: 'cp-2024:art12',
@@ -10,6 +11,11 @@ const bad = JSON.stringify({
 });
 
 export const steps: Step[] = [
+  { segment: 1, npm: 'npm run seg1 -- query --q "franchigia incendio" --text', tool: 'seg1', args: ['query', '--q', 'franchigia incendio', '--text'], expectExit: 0, fallback: 'rag-query.txt' },
+  { segment: 1, npm: 'npm run seg1 -- delete --edition 2024 --text', tool: 'seg1', args: ['delete', '--edition', '2024', '--text'], expectExit: 0 },
+  { segment: 1, npm: 'npm run seg1 -- query --q "franchigia incendio" --text', tool: 'seg1', args: ['query', '--q', 'franchigia incendio', '--text'], expectExit: 0, fallback: 'rag-after-delete.txt' },
+  { segment: 1, npm: 'npm run seg1 -- extract --section art12 --text', tool: 'seg1', args: ['extract', '--section', 'art12', '--text'], expectExit: 0, fallback: 'rag-extract.txt', note: 'recorded one-shot response (fixtures/llm/oneshot@v1.json), no model call' },
+  { segment: 1, npm: 'npm run seg1 -- delete --edition 2030', tool: 'seg1', args: ['delete', '--edition', '2030'], expectExit: 2, note: 'an edition that is not in the index is rejected' },
   { segment: 2, npm: 'npm run seg2 -- log-init --text', tool: 'seg2', args: ['log-init', '--text'], expectExit: 0 },
   { segment: 2, npm: 'npm run seg2 -- ingest --edition 2024 --text', tool: 'seg2', args: ['ingest', '--edition', '2024', '--text'], expectExit: 0 },
   { segment: 2, npm: 'npm run seg2 -- extract structure --doc cp-2024 --text', tool: 'seg2', args: ['extract', 'structure', '--doc', 'cp-2024', '--text'], expectExit: 0 },

@@ -27,7 +27,7 @@ for (const dep of Object.keys(pkg.devDependencies)) {
 const required = [
   'AGENTS.md', 'CLAUDE.md', 'README.md', 'DECISIONS.md', 'LICENSE', '.nvmrc', 'package-lock.json',
   '.claude/settings.json', 'agent/skills', 'agent/agents', '.claude/skills', '.claude/agents',
-  'fixtures/documents/manifest.json', 'fixtures/llm/structure@v1.json', 'fixtures/llm/claims@v1.json', 'fixtures/review-script.json',
+  'fixtures/documents/manifest.json', 'fixtures/llm/structure@v1.json', 'fixtures/llm/claims@v1.json', 'fixtures/llm/oneshot@v1.json', 'fixtures/review-script.json',
   'events/.gitkeep',
 ];
 for (const r of required) if (!existsSync(repoPath(r))) problems.push(`missing ${r}`);

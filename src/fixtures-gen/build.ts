@@ -1,6 +1,7 @@
 // Builds every generated fixture as a path -> content map. Pure (no I/O).
 import { claimsInputHash, structureInputHash, type ClaimDraftOut, type RecordingFile, type StructureOut } from '../agents/replay';
 import { buildEdition, type Edition } from './documents';
+import { oneShotInputHash, sectionText, type OneShotBlob } from '../rag/oneShot';
 
 const json = (v: unknown) => `${JSON.stringify(v, null, 2)}\n`;
 const DOC_ID = { '2024': 'cp-2024', '2025': 'cp-2025' } as const;
@@ -89,6 +90,28 @@ export function buildFixtures(): Record<string, string> {
       draft(e25, 'weather.coinsurance', '5 %'),
     ],
   }));
+
+  // oneshot@v1: ONE call returns one blob for Art. 12 (segment 1). No offsets, no versions, no ids.
+  // Deliberate faults: a wrong value (15 % instead of 10 % / 5 %) and a missing clause (liability limit).
+  // Which layer is at fault cannot be read off the blob; that is the point.
+  const blobItems = (e: Edition): OneShotBlob['voci'] => e.art12.clauses
+    .filter((c) => c.key !== 'liability.limit')
+    .map((c) => {
+      const [coverage, rest] = c.text.split(': ') as [string, string];
+      const tipo = rest.startsWith('franchigia') ? 'franchigia' : 'scoperto';
+      const raw = /(\d[\d.]* (?:EUR|%)|\d+ %)/.exec(rest)![1]!;
+      const wrong = (e.year === '2024' && c.key === 'theft.coinsurance') || (e.year === '2025' && c.key === 'weather.coinsurance');
+      return { copertura: coverage, tipo, valore: wrong ? '15 %' : raw };
+    });
+  const oneShotFor = (years: ('2024' | '2025')[]) => ({
+    inputHash: oneShotInputHash('art12', years.map((y) => sectionText(ed[y].text, 'art12'))),
+    note: `editions in the index: ${years.join('+')}`,
+    output: { articolo: 'Art. 12', titolo: 'Franchigie e scoperti', voci: years.flatMap((y) => blobItems(ed[y])) } satisfies OneShotBlob,
+  });
+  out['fixtures/llm/oneshot@v1.json'] = json({
+    extractor: 'oneshot@v1', modelId: 'fixture-replay', promptVersion: 'oneshot-p1',
+    responses: [oneShotFor(['2024', '2025']), oneShotFor(['2025']), oneShotFor(['2024'])],
+  });
 
   // Scripted human decisions for `--auto` runs. Spans are ABSOLUTE.
   const abs = (e: Edition, key: string) => {

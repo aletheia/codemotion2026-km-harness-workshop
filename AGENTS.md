@@ -29,6 +29,7 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 |---|---|
 | `npm run doctor` | Checks Node version, installed deps, required files, generated copies. |
 | `npm run reset` | Returns the demo to a clean state (empties `events/` and `projections/`). Not pre-granted. |
+| `npm run seg1 -- <sub>` | Segment 1 baseline: `query --q <text>`, `delete --edition <year>`, `extract --section art12`, `index`. Index is in `state/`; `reset` removes it. |
 | `npm run seg2 -- <sub>` | Segment 2 pipeline: `log-init`, `ingest`, `extract structure\|claims`, `review`, `show`. |
 | `npm run unit -- --doc cp-2024 [--section art12]` | Prints the extraction unit you are allowed to see. |
 | `npm run propose -- --file <claims.json>` | Agent write path. Provenance checked inside; whole batch rejected on failure (exit 2). |
@@ -38,7 +39,7 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 | `npm run fixtures` | Regenerates `fixtures/` (a test fails if they differ from the committed ones). |
 | `npm test`, `npm run typecheck` | Test suite and type check. |
 
-More commands appear in later commits (seg1, seg3..seg6, compare, beliefs, eval, drift, ask, golden).
+More commands appear in later commits (seg3..seg6, compare, beliefs, eval, drift, ask, golden).
 
 ## Glossary (defined once)
 

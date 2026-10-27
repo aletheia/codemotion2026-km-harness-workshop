@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { execute, renderFallback } from '../tools/dry-run';
+import { execute, renderFallback, renderNamed } from '../tools/dry-run';
 import { read, root } from './helpers';
 
 describe('fallback folders', { timeout: 120_000 }, () => {
@@ -19,6 +19,12 @@ describe('fallback folders', { timeout: 120_000 }, () => {
       const file = read(join(root, `fallback/seg${seg}/expected-output.txt`));
       expect(file).toBe(renderFallback(seg, recs));
       expect(file).toMatch(/DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION/);
+      for (const r of recs) {
+        if (!r.fallback) continue;
+        const named = read(join(root, `fallback/seg${seg}/${r.fallback}`));
+        expect(named, r.fallback).toBe(renderNamed(r));
+        if (!r.fallback.endsWith('.jsonl')) expect(named).toMatch(/DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION/);
+      }
     }
   });
 });

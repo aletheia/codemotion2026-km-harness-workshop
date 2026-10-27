@@ -1,0 +1,7 @@
+# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
+# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
+# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
+$ npm run seg1 -- query --q "franchigia incendio" --text
+
+query "franchigia incendio" over 46 chunks; fields per result: rank, chunkId, score, text
+  #1  score 0.7403  78e357f8d2607336  Incendio: franchigia di 750 EUR a evento
