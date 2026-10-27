@@ -1,5 +1,6 @@
 // The walkthrough log up to the end of a segment, built on a temp log with the same steps the npm scripts run.
 import { compareBatch, reconfirmStructure } from '../src/processes/compare';
+import { replayClaims } from '../src/processes/replay';
 import { reviewAuto } from '../src/processes/review';
 import { extractClaimsStep } from '../src/tools/extract-claims';
 import { extractStructureStep } from '../src/tools/extract-structure';
@@ -21,5 +22,12 @@ export function segment3Log(path: string = tmpLog()): string {
   extractClaimsStep('v9', ['c2', 'c3', 'c5'], { path });
   compareBatch(path);
   reviewAuto(path);
+  return path;
+}
+
+/** seq 1–46: segment 3, then segment 4's replay of the Claims layer with claims@v2 (five v8 + six v9 proposals). */
+export function segment4Log(path: string = tmpLog()): string {
+  segment3Log(path);
+  replayClaims('claims@v2', path);
   return path;
 }

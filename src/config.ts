@@ -52,9 +52,13 @@ export const config = {
     note: 'initial version, no predecessor',
   },
 
-  // Named golden-set cut-offs (seq numbers): g1 = end of segment 2.
   golden: {
-    g1: 15,
+    // Named golden-set cut-offs (seq numbers): g1 = end of segment 2. A query without a named cut-off reads
+    // to the end of the log and is named after the next one (g2).
+    cutoffs: { g1: 15 } as Readonly<Record<string, number>>,
+    // Claim ids used as few-shot examples in each extractor's prompt: excluded from its golden set, otherwise
+    // the eval measures the prompt's recall. The authored fixtures use none.
+    promptExampleIds: { 'claims@v1': [], 'claims@v2': [] } as Readonly<Record<string, readonly string[]>>,
   },
 
   eval: {

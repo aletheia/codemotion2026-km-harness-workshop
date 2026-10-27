@@ -27,6 +27,11 @@ export const scriptNarration: Readonly<Record<string, string>> = {
   'projections:diff': 'compares the beliefs of the promoted extractor (claims@v1) with the candidate claims@v2',
   'beliefs:at-2019-04-30': 'the beliefs valid on 2019-04-30 (valid time), folded from the log',
   'beliefs': 'the beliefs valid today, folded from the log',
+  'golden:claims-until-seg2': 'the golden set is a query over the log: human-verified claims up to the end of segment 2 (g1)',
+  'golden:claims': 'the same query up to the current end of the log: the golden set grows with every human decision',
+  'eval:claims-v1': 'runs claims@v1 against golden set g1: alignment by subject key, precision, recall, provenance IoU',
+  'eval:claims-v2-summary': 'runs claims@v2 against the same golden set and checks the four promotion criteria',
+  'drift:v1-v2': 'per-item comparison of v1 and v2 on g1: what improved, what regressed, what drifted in provenance',
 };
 
 export function narrate(script: string | undefined): void {

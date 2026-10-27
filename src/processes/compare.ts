@@ -204,8 +204,8 @@ export function compareBatch(path: string = config.paths.log): BatchComparison |
     }, beliefs, catalog, { thetaIoU: config.eval.iouThreshold }),
   }));
 
-  // Probe items enter the batch in phase E1; until then the gate is either not applicable (cold start)
-  // or throws because the batch carries no probes.
+  // Probe items are measured with eval/batchGate.probeOf; the workshop batches carry none, so the gate is
+  // either not applicable (cold start, the live case) or throws because the batch carries no probes.
   const rateFor = (b: Belief) => auditRate(b.root.kind, isColdStart(gate));
   const results = proposals.flatMap(({ proposal, comparison }) => {
     const rate = comparison.cls === 'A' ? rateFor(comparison.evidence.belief) : 0;

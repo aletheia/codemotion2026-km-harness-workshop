@@ -62,4 +62,15 @@ export const segments: Readonly<Record<number, Segment>> = {
       { script: 'beliefs', why: '…and what it says today, from the same log.' },
     ],
   },
+  5: {
+    title: 'The harness: golden set, eval, drift, promotion',
+    expectsEvents: 46,
+    steps: [
+      { script: 'golden:claims-until-seg2', why: 'The golden set is not a file: it is a query over human decisions in the log, here up to segment 2.' },
+      { script: 'golden:claims', why: 'The same query today: it has grown with the decisions taken in segment 3.' },
+      { script: 'eval:claims-v1', why: 'claims@v1 against g1: precision, recall and provenance, with the counting rules on screen.' },
+      { script: 'eval:claims-v2-summary', why: 'claims@v2 scores higher on recall, yet it is not promoted: criteria 1 and 3 fail.' },
+      { script: 'drift:v1-v2', why: 'Item by item: the regression on ricavi.limite that an average would hide.' },
+    ],
+  },
 };

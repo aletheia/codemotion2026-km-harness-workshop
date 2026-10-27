@@ -55,6 +55,20 @@ export function normalize(surface: string, hint?: Pick<Subject, 'valueType' | 'u
   return unit === undefined ? { type: 'integer', value: n } : { type: 'integer', value: n, unit };
 }
 
+/**
+ * Why two amounts differ, when the difference is a lost multiplier: the actual amount is the expected one
+ * divided by a power of 1,000 and the expected surface carries a multiplier word ("2 milioni di euro" read
+ * as 2,000 EUR → '"milioni" dropped'). Undefined for any other difference.
+ */
+export function droppedMultiplier(expected: NormalizedValue, actual: NormalizedValue, expectedSurface: string): string | undefined {
+  if (expected.type !== 'money' || actual.type !== 'money' || actual.amount <= 0 || actual.amount >= expected.amount) return undefined;
+  let ratio = expected.amount / actual.amount;
+  while (ratio > 1 && Number.isInteger(ratio / 1_000)) ratio /= 1_000;
+  if (ratio !== 1) return undefined;
+  const word = expectedSurface.toLowerCase().split(/[\s:;]+/u).find((t) => MULTIPLIERS[t] !== undefined);
+  return word === undefined ? undefined : `"${word}" dropped`;
+}
+
 /** On-screen form: "2,000,000 EUR", "2 years", "10", "minimo s.p.a.". */
 export function displayValue(v: NormalizedValue): string {
   switch (v.type) {
