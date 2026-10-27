@@ -1,0 +1,26 @@
+{
+  "reviewer": "luca",
+  "stages": [
+    {
+      "id": "structure-v8",
+      "title": "structure tree of cc-art2477@v8",
+      "decisions": [
+        { "action": "verify-structure", "treeId": "tree-v8", "note": "abrogated comma kept as note; paths follow the v9 numbering" }
+      ]
+    },
+    {
+      "id": "claims-v8",
+      "title": "claim proposals of cc-art2477@v8 (c2)",
+      "decisions": [
+        { "action": "verify", "claim": "clm-attivo2m", "note": "ok" },
+        { "action": "verify", "claim": "clm-ricavi2m", "note": "ok" },
+        { "action": "leave", "claim": "clm-eserc3", "note": "value misread (text says due)" },
+        { "action": "leave", "claim": "clm-capitale", "note": "abrogated 2014 trigger, not in text" },
+        { "action": "add", "documentId": "cc-art2477", "version": "v8", "sectionPath": "c2", "subjectKey": "esercizi.consecutivi",
+          "value": "due esercizi", "span": { "start": 936, "end": 964 }, "note": "added by reviewer" },
+        { "action": "add", "documentId": "cc-art2477", "version": "v8", "sectionPath": "c2", "subjectKey": "dipendenti.limite",
+          "value": "10 unità", "span": { "start": 1131, "end": 1189 }, "note": "missing in v1 output" }
+      ]
+    }
+  ]
+}

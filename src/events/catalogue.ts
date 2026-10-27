@@ -16,7 +16,7 @@ export type ClaimProposed = FactEvent<'ClaimProposed', {
 }>;
 
 export type ClaimVerified = DecisionEvent<'ClaimVerified', { claimId: ClaimId },
-  | { kind: 'human';   note: string }
+  | { kind: 'human';   note: string; checkedSpan?: Span }
   | { kind: 'class-A'; reconfirmedBeliefId: ClaimId; batchId: string; probeResult: 'passed' | 'not-applicable' }
   | { kind: 'import';  sourceRecord: string }>;
 

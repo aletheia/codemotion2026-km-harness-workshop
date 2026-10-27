@@ -8,7 +8,19 @@ export const config = {
     projections: 'out/projections',
     ragIndex: 'out/rag/index.json',
     llmFixtures: 'fixtures/llm',
+    documents: 'fixtures/documents',
+    reviewDecisions: 'fixtures/review/decisions.json',
   },
+
+  // The lineage of the example and the Normattiva act its versions come from.
+  source: {
+    lineageId: 'cc-art2477',
+    atto: '042U0262',
+    article: '2477',
+  },
+
+  // The reviewer of the walkthrough (actor human(luca)).
+  reviewer: 'luca',
 
   // Segment 1 retrieval baseline: one chunk per paragraph, TF-IDF cosine, top 3; the query is the segment-6 question.
   rag: {

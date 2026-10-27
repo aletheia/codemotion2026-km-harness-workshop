@@ -24,4 +24,18 @@ export const segments: Readonly<Record<number, Segment>> = {
       { script: 'rag:extract-c2', why: 'Failure 3: a one-shot extraction returns a value with no span, no version and no date: nothing to verify it against.' },
     ],
   },
+  2: {
+    title: 'Build the log by hand: comma 2 of v8',
+    expectsEvents: 0,
+    steps: [
+      { script: 'log:reset', why: 'Starts from an empty out/: the room sees the log born at seq 1.' },
+      { script: 'log:init', why: 'The log is one append-only JSONL file; every projection is a fold over it.' },
+      { script: 'ingest:v8', why: 'The source layer: a DocumentVersion with its content hash and validity period, not a file.' },
+      { script: 'extract:structure-v8', why: 'An agent proposes the section tree. Agents only propose: they never verify.' },
+      { script: 'review', auto: 'review:auto', why: 'A human verifies the tree. Only a verified tree crosses the ACL into the Claims context.' },
+      { script: 'extract:claims-v8', why: 'The ACL cuts one unit per comma; the claims agent proposes four claims with spans and normalized values.' },
+      { script: 'show:ricavi-v8', why: 'One claim up close: span, normalized value, extractor version and the event that caused it.' },
+      { script: 'review', auto: 'review:auto', why: 'The human verifies two claims, leaves two proposed and adds the two the agent missed.' },
+    ],
+  },
 };

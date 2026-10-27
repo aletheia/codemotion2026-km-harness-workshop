@@ -124,10 +124,13 @@ export const DocumentVersionIngested = fact('DocumentVersionIngested', 'source',
 export const StructureProposed = fact('StructureProposed', 'structure', actorOf('agent'),
   z.strictObject({ treeId: nonEmpty, documentId: nonEmpty, version: nonEmpty, nodes: z.array(sectionNodeSchema).min(1) }));
 
+// The human check of a tree records what was checked: nodes reviewed / total and the interval the nodes cover.
+const treeCheck = { nodesChecked: z.int().nonnegative(), nodesTotal: z.int().positive(), covers: z.tuple([z.int().nonnegative(), z.int().nonnegative()]) };
+
 export const StructureVerified = decision('StructureVerified', 'structure', actorOf('human', 'harness'),
   z.strictObject({ treeId: nonEmpty }),
   z.discriminatedUnion('kind', [
-    humanNote,
+    evidenceWith('human', { note: nonEmpty, ...treeCheck }),
     evidenceWith('class-A', { reconfirmedTreeId: nonEmpty, probeResult: z.enum(['passed', 'not-applicable']) }),
   ]));
 
@@ -145,10 +148,11 @@ export const ClaimProposed = fact('ClaimProposed', 'claims', actorOf('agent', 'h
     sectionPath: nonEmpty,
   }));
 
+// checkedSpan: the span the reviewer read when verifying an agent proposal (absent on the reviewer's own claims).
 export const ClaimVerified = decision('ClaimVerified', 'claims', actorOf('human', 'harness', 'import'),
   z.strictObject({ claimId: hex16 }),
   z.discriminatedUnion('kind', [
-    humanNote,
+    evidenceWith('human', { note: nonEmpty, checkedSpan: spanSchema.optional() }),
     evidenceWith('class-A', { reconfirmedBeliefId: hex16, batchId: nonEmpty, probeResult: z.enum(['passed', 'not-applicable']) }),
     evidenceWith('import', { sourceRecord: nonEmpty }),
   ]));

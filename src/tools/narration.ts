@@ -10,6 +10,13 @@ export const scriptNarration: Readonly<Record<string, string>> = {
   'rag:query': 'asks the index the segment-6 question: the top chunks by similarity, with no version or validity date',
   'rag:delete-v8': 'deletes the v8 chunks from the index: what the index "knew" disappears with the document',
   'rag:extract-c2': 'one-shot extraction of comma 2 of v8 from the retrieved chunk: a JSON blob, no span, no version, no date',
+  'ingest:v8': 'appends DocumentVersionIngested for v8, after checking its text against the hash in manifest.json',
+  'extract:structure-v8': 'the structure agent proposes the section tree of v8 (StructureProposed): nothing is verified yet',
+  'extract:claims-v8': 'the ACL turns the verified tree into extraction units; the claims agent proposes claims for comma 2 of v8',
+  'review': 'the reviewer CLI (a process, actor human): shows each pending decision with its evidence; Enter confirms',
+  'review:auto': 'applies the pending review stage from fixtures/review/decisions.json without waiting',
+  'show': 'prints one event of the log as JSON: envelope, actor, causation, payload, evidence',
+  'show:ricavi-v8': 'prints the ricavi.limite proposal as JSON: span, normalized value, extractor version, causation',
 };
 
 export function narrate(script: string | undefined): void {
