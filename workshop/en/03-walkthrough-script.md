@@ -1,7 +1,7 @@
 # Live walkthrough script — "Documents Are Not Knowledge"
 
 Codemotion Milan 2026 · Wed 28 Oct 2026, 15:20–16:40 CET · Luca Bianchi
-Companion to `01-run-sheet.md` (times, slide ranges), `00-running-example.md` (the example: values, spans, fixtures, checkpoints) and `CLAUDE_CODE_INSTRUCTIONS.md` §7 (npm scripts, fallback files). English, revision 4, 27 Oct 2026.
+Companion to `01-run-sheet.md` (times, slide ranges), `00-running-example.md` (the example: values, spans, fixtures, checkpoints) and `AGENTS.md` §11 (npm scripts, fallback files). English, revision 4, 27 Oct 2026.
 
 All event ids (`ev-0007`), claim ids (`clm-ricavi2m`), batch ids, hashes, model ids and harness thresholds in this script are **illustrative**. Offsets are the real ones of the fixture files (`fixtures/documents/manifest.json`). The repository prints its own deterministic ids; the shapes and the counts are what must match.
 

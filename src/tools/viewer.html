@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNK Viewer</title>
+<style>
+  :root {
+    --bg: #fafaf8; --panel: #fff; --fg: #1d1d1b; --muted: #6b6b66; --line: #e4e3de;
+    --accent: #2f5bd3; --decision: #b8860b;
+    --proposed: #6b6b66; --verified: #1e8a4c; --contested: #c0392b; --superseded: #8a8a85;
+    --mark: #fff1a8;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161615; --panel: #1f1f1d; --fg: #ecebe6; --muted: #9a9a94; --line: #34332f;
+      --accent: #7c9dff; --decision: #e0b44a;
+      --proposed: #a5a59e; --verified: #4cc27f; --contested: #ff6b5b; --superseded: #77776f;
+      --mark: #5a4d12;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line);
+           display: flex; align-items: center; gap: 16px; padding: 10px 16px; flex-wrap: wrap; }
+  h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  nav button { font: inherit; background: none; border: 1px solid var(--line); color: var(--fg);
+               padding: 4px 12px; border-radius: 6px; cursor: pointer; }
+  nav button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .status { margin-left: auto; color: var(--muted); font-size: 12px; }
+  main { padding: 16px; max-width: 1400px; margin: 0 auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--panel); }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--muted); font-size: 12px; background: var(--panel); }
+  td.mono, .mono { font-family: var(--mono); font-size: 12.5px; }
+  td.mono { white-space: nowrap; }
+  .wrap { overflow-x: auto; }
+  tr.ev { cursor: pointer; }
+  tr.ev:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+  tr.new { animation: flash 1.6s ease-out; }
+  @keyframes flash { from { background: color-mix(in srgb, var(--accent) 30%, transparent); } }
+  .star { color: var(--decision); }
+  pre.raw { margin: 0; padding: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+            font: 12px/1.4 var(--mono); white-space: pre-wrap; word-break: break-all; }
+  .pill { display: inline-block; padding: 0 8px; border-radius: 10px; font-size: 12px; font-weight: 600;
+          border: 1px solid currentColor; }
+  .proposed { color: var(--proposed); } .verified { color: var(--verified); }
+  .contested { color: var(--contested); } .superseded { color: var(--superseded); }
+  .muted { color: var(--muted); }
+  .filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .filters select, .filters input { font: inherit; padding: 3px 6px; background: var(--panel); color: var(--fg);
+                                     border: 1px solid var(--line); border-radius: 6px; }
+  .chunks { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 12px; }
+  .chunk { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .chunk.gone { opacity: .45; border-style: dashed; }
+  .chunk h3 { margin: 0 0 6px; font: 600 12.5px var(--mono); display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .chunk p { margin: 0; white-space: pre-wrap; font-size: 13px; }
+  mark { background: var(--mark); color: inherit; border-radius: 2px; }
+  .tags { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
+  .empty { color: var(--muted); padding: 32px; text-align: center; }
+  .banner { background: color-mix(in srgb, var(--contested) 14%, var(--panel)); border: 1px solid var(--contested);
+            border-radius: 6px; padding: 6px 10px; margin-bottom: 12px; font-size: 13px; }
+  .review { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; min-width: 260px; }
+  .review select { font: inherit; font-size: 12.5px; padding: 3px 6px; background: var(--bg); color: var(--fg);
+                   border: 1px solid var(--line); border-radius: 6px; max-width: 100%; }
+  .review input { flex: 1 1 140px; font: inherit; font-size: 12.5px; padding: 3px 6px; background: var(--bg); color: var(--fg);
+                  border: 1px solid var(--line); border-radius: 6px; }
+  .review button { font: inherit; font-size: 12.5px; padding: 3px 10px; border-radius: 6px; cursor: pointer;
+                   border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+  .review button.ok { background: var(--verified); border-color: var(--verified); color: #fff; }
+  .review button:disabled { opacity: .5; cursor: default; }
+  .msg { font-size: 12px; }
+  .msg.err { color: var(--contested); }
+  body { padding-bottom: 64px; }
+  .logview { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .docpanel { position: sticky; top: 64px; max-height: calc(100vh - 150px); overflow: auto; background: var(--panel);
+              border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .docpanel h2 { font: 600 13px var(--mono); margin: 0 0 8px; }
+  pre.doc { margin: 0; white-space: pre-wrap; font: 13px/1.5 system-ui, sans-serif; }
+  pre.doc mark { padding: 0 1px; }
+  pre.doc mark.alt { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+  pre.doc sup { font: 600 10px var(--mono); color: var(--accent); }
+  tr.sel { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  tr.chain { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  tr.chain td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  tr.future { opacity: .3; }
+  footer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; background: var(--bg); border-top: 1px solid var(--line);
+           display: flex; gap: 12px; align-items: center; padding: 10px 16px; flex-wrap: wrap; font-size: 13px; }
+  footer input[type=range] { flex: 1 1 240px; accent-color: var(--accent); }
+  footer button { font: inherit; padding: 2px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
+  footer button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .graph-wrap { overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .graph-wrap svg { display: block; }
+  .graph-wrap text { font: 11.5px var(--mono); fill: var(--fg); }
+  .graph-wrap text.d { font: 10.5px system-ui, sans-serif; fill: var(--muted); }
+  .graph-wrap text.col { font: 600 12px system-ui, sans-serif; fill: var(--muted); }
+  .graph-wrap text.rowlabel { font: 11px var(--mono); fill: var(--muted); }
+  .graph-wrap .node { cursor: pointer; }
+  .graph-wrap .node rect { fill: var(--bg); stroke-width: 1.5; }
+  .graph-wrap .node.excerpt rect { stroke-dasharray: 4 3; }
+  .graph-wrap .dim { opacity: .15; }
+  .graph-wrap path.edge { fill: none; stroke-width: 1.3; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 8px; align-items: center; }
+  .legend i { display: inline-block; width: 22px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 4px; }
+  .nodeinfo { min-height: 22px; margin: 6px 0 10px; font-size: 13px; }
+  .explain { position: fixed; left: 0; right: 0; bottom: 49px; z-index: 3; background: var(--panel); border-top: 1px solid var(--line);
+             box-shadow: 0 -4px 12px color-mix(in srgb, var(--fg) 8%, transparent); }
+  .explain[hidden] { display: none; }
+  .explain header { position: static; border: 0; padding: 6px 16px; gap: 10px; background: none; }
+  .explain header strong { font: 600 13px var(--mono); }
+  .explain .body { padding: 0 16px 12px; max-height: 28vh; overflow: auto; font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
+  .explain .seg button { font: inherit; font-size: 12px; padding: 1px 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+  .explain .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  body.explain-open { padding-bottom: calc(64px + 30vh); }
+  nav button.later { opacity: .45; }
+  @media (max-width: 900px) { .logview { grid-template-columns: 1fr; } .docpanel { position: static; max-height: none; } }
+  @media (max-width: 700px) { .hide-sm { display: none; } .chunks { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Documents Are Not Knowledge · viewer</h1>
+  <nav role="tablist">
+    <button data-tab="log" aria-selected="true">Log</button>
+    <button data-tab="claims">Claims</button>
+    <button data-tab="chunks">Chunks</button>
+    <button data-tab="graph">Dependencies</button>
+  </nav>
+  <span class="status" id="status">loading…</span>
+</header>
+<main id="main"></main>
+<section class="explain" id="explain" hidden aria-label="Explain this row">
+  <header>
+    <strong id="ex-title">Explain</strong>
+    <span class="seg"><button data-lang="it">IT</button><button data-lang="en">EN</button></span>
+    <span class="muted" id="ex-model"></span>
+  </header>
+  <div class="body" id="ex-body"></div>
+</section>
+<footer>
+  <button id="ex-toggle" aria-expanded="false">explain ▴</button>
+  <span>log row</span>
+  <input type="range" id="at" min="0" max="0" value="0" aria-label="log row">
+  <span class="mono" id="at-label">—</span>
+  <button id="live" aria-pressed="true">live</button>
+  <span class="muted" id="at-note">claims and states are the fold of the log up to this row</span>
+</footer>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let data = null, tab = 'log', seen = 0;
+// at = null follows the end of the log (live); a number freezes the fold at that row. sel = the selected log row.
+let at = null, sel = null, gsel = null;   // gsel: the selected node of the Dependencies tab
+const SNAP = window.SNAPSHOT ?? null;          // set by npm run viewer -- --export: no server, data inside the page
+const pad = (n) => String(n).padStart(4, '0');
+const live = () => at === null || at >= data.total;
+
+// Explain panel: shared by every tab, follows the selected log row; open/closed and language survive reloads.
+const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+let exOpen = store.get('dnk-explain-open') === '1', exLang = store.get('dnk-explain-lang') === 'en' ? 'en' : 'it';
+const exText = {}, exErr = {}, exBusy = new Set();
+let exTimer = null;
+// Review drafts survive re-renders: the chosen target state, successor and note per claim; last message per claim.
+const drafts = {}, msgs = {};
+const draftOf = (c) => (drafts[c.claimId] ??= { to: c.state, successor: '', note: '' });
+// What a human may set from each state (04-domain-model-reference.md §5); the server checks it again.
+const TARGETS = { proposed: ['verified'], contested: ['verified', 'superseded'], verified: ['superseded'], superseded: [] };
+const byId = (id) => data.claims.find((c) => c.claimId === id);
+const sameKey = (c) => data.claims.filter((o) => o.claimId !== c.claimId && o.lineageId === c.lineageId && o.subjectKey === c.subjectKey);
+const filters = { layer: '', state: '', version: '' };
+
+function selectTab(name) {
+  tab = name;
+  document.querySelectorAll('nav button').forEach((x) => x.setAttribute('aria-selected', x.dataset.tab === name));
+}
+document.querySelectorAll('nav button').forEach((b) => b.onclick = () => { selectTab(b.dataset.tab); render(); });
+// data.features names, for each tab this checkout has not built yet, the tag that adds it; the tab stays visible.
+const later = (name) => data.features?.[name];
+const notYet = (name) => `<p class="muted">The ${esc(document.querySelector(`nav button[data-tab=${name}]`).textContent)} tab arrives with
+  <span class="mono">${esc(later(name))}</span>: <span class="mono">git checkout ${esc(later(name))}</span>, then reload.</p>`;
+
+function chainOf(seq) {
+  // The rows this one derives from: follow causation (←) back to the root.
+  const bySeq = new Map(data.log.map((e) => [e.seq, e]));
+  const chain = new Set();
+  for (let e = bySeq.get(seq); e?.causeSeq && !chain.has(e.causeSeq); e = bySeq.get(e.causeSeq)) chain.add(e.causeSeq);
+  return chain;
+}
+
+function renderDoc(e) {
+  if (!e) return '<p class="muted">Click a row: its span lights up in the text of the version it reads, and the rows it derives from (←) are marked.</p>';
+  const raw = `<details><summary class="muted">raw event</summary><pre class="raw">${esc(JSON.stringify(e.raw, null, 2))}</pre></details>`;
+  if (!e.focus) return `<h2>${esc(e.id)} · ${esc(e.type)}</h2><p class="muted">This event does not point at the source text.</p>${raw}`;
+  const text = data.documents[e.focus.version] ?? '';
+  let html = '', pos = 0;
+  [...e.focus.spans].sort((a, b) => a.start - b.start).forEach((s, i) => {
+    if (s.start < pos) return;
+    html += esc(text.slice(pos, s.start)) + `<mark class="${i % 2 ? 'alt' : ''}" title="${esc(s.label)}"><sup>${esc(s.label)}</sup> ${esc(text.slice(s.start, s.end))}</mark>`;
+    pos = s.end;
+  });
+  html += esc(text.slice(pos));
+  return `<h2>${esc(e.id)} · ${esc(e.type)} · document ${esc(e.focus.version)}</h2><pre class="doc">${html}</pre>${raw}`;
+}
+
+function renderLog() {
+  if (!data.log.length) return '<p class="empty">The log is empty — run <code>npm run log:init</code>.</p>';
+  const layers = [...new Set(data.log.map((e) => e.layer))];
+  const chain = sel ? chainOf(sel) : new Set();
+  const rows = data.log.filter((e) => !filters.layer || e.layer === filters.layer).map((e) => `
+    <tr class="ev ${e.seq > seen ? 'new' : ''} ${e.seq === sel ? 'sel' : ''} ${chain.has(e.seq) ? 'chain' : ''} ${e.seq > data.at ? 'future' : ''}" data-seq="${e.seq}">
+      <td class="mono">${pad(e.seq)} ${e.decision ? '<span class="star">★</span>' : '·'}</td>
+      <td class="mono">${esc(e.type)}</td>
+      <td class="mono">${esc(e.actor)}</td>
+      <td>${esc(e.layer)}</td>
+      <td class="mono">${esc(e.label)}</td>
+      <td class="mono hide-sm">${e.cause ? '← ' + esc(e.cause) : ''}</td>
+      <td class="hide-sm">${esc(e.evidence ?? '')}</td>
+    </tr>`).join('');
+  return `<div class="filters">
+      <select id="f-layer"><option value="">all layers</option>${layers.map((l) => `<option ${l === filters.layer ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <span class="muted">${data.log.length} events · ★ = decision · click a row to see its span and its ← chain</span>
+    </div>
+    <div class="logview">
+      <div class="wrap"><table><thead><tr><th>seq</th><th>type</th><th>actor</th><th>layer</th><th>label</th><th class="hide-sm">cause</th><th class="hide-sm">evidence</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <aside class="docpanel">${renderDoc(data.log.find((e) => e.seq === sel))}</aside>
+    </div>`;
+}
+
+function renderClaims() {
+  if (!data.claims.length) return '<p class="empty">No claims yet — they appear after <code>npm run extract:claims-v8</code>.</p>';
+  const counts = data.claims.reduce((m, c) => (m[c.state] = (m[c.state] ?? 0) + 1, m), {});
+  const rows = data.claims.filter((c) => !filters.state || c.state === filters.state).map((c) => `
+    <tr>
+      <td class="mono">${esc(c.label)}</td>
+      <td><span class="pill ${c.state}">${c.state}</span>${c.supersededBy ? `<div class="muted mono">→ ${esc(byId(c.supersededBy)?.label ?? c.supersededBy.slice(0, 8))}</div>` : ''}</td>
+      <td class="mono">${esc(c.subjectKey)}</td>
+      <td class="mono">${esc(c.value)}</td>
+      <td class="mono">${c.spans.map((s) => `${s.version} ${esc(c.sectionPath ?? '')} [${s.start},${s.end})`).join('<br>')}</td>
+      <td>${c.spans.map((s) => `<q>${esc(s.text)}</q>`).join('<br>')}</td>
+      <td class="mono hide-sm">${esc(c.proposedBy)}<br><span class="muted">${c.history.map(esc).join('<br>')}</span></td>
+      ${data.writable && live() ? `<td>${reviewCell(c)}</td>` : ''}
+    </tr>`).join('');
+  const past = live() ? '' : `<div class="banner">Claims as they were at row ${pad(data.at)} of ${data.total}: the fold of the first ${data.at} events. Move the slider to the end (or press live) to see the current state${data.writable ? ' and change it' : ''}.</div>`;
+  const banner = past || !data.writable ? past
+    : `<div class="banner"><strong>Write mode.</strong> Changing a state appends <code>ClaimVerified</code> / <code>ClaimSuperseded</code> as human(luca) to the log. Not during the live demo: every append shifts the seq of everything the walkthrough appends after it.</div>`
+  return `${banner}<div class="filters">
+      <select id="f-state"><option value="">all states</option>${['proposed', 'verified', 'contested', 'superseded'].map((s) => `<option ${s === filters.state ? 'selected' : ''}>${s}</option>`).join('')}</select>
+      <span class="muted">${data.claims.length} claims · ${Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(' · ')}</span>
+    </div>
+    <div class="wrap"><table><thead><tr><th>label</th><th>state</th><th>subject</th><th>value</th><th>span</th><th>span text</th><th class="hide-sm">provenance</th>${data.writable && live() ? '<th>review</th>' : ''}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function reviewCell(c) {
+  const m = msgs[c.claimId];
+  const msg = m ? `<div class="msg ${m.err ? 'err' : 'muted'}">${esc(m.text)}</div>` : '';
+  const targets = TARGETS[c.state];
+  if (!targets.length) return msg || '<span class="muted">terminal</span>';
+  const d = draftOf(c);
+  const candidates = sameKey(c).filter((o) => o.state !== 'superseded');
+  const belief = sameKey(c).find((o) => o.state === 'verified');
+  let detail = '';
+  if (d.to === 'superseded') {
+    detail = candidates.length
+      ? `<select data-field="successor"><option value="">superseded by…</option>${candidates.map((o) =>
+          `<option value="${o.claimId}" ${o.claimId === d.successor ? 'selected' : ''}>${esc(o.label)} · ${esc(o.value)} · ${o.spans[0]?.version ?? ''} · ${o.state}</option>`).join('')}</select>`
+      : `<span class="msg err">no other claim on ${esc(c.subjectKey)} can supersede it</span>`;
+  } else if (d.to === 'verified' && c.state === 'contested' && belief) {
+    detail = `<span class="msg muted">also supersedes ${esc(belief.label)} (${esc(belief.value)})</span>`;
+  } else if (d.to === 'verified' && c.state === 'proposed' && belief) {
+    detail = `<span class="msg err">${esc(belief.label)} is already verified on this key: supersede it instead</span>`;
+  }
+  const ready = d.to !== c.state && d.note.trim() && (d.to !== 'superseded' || d.successor);
+  return `<div class="review" data-claim="${c.claimId}">
+      <select data-field="to">${[c.state, ...targets].map((s) => `<option value="${s}" ${s === d.to ? 'selected' : ''}>${s === c.state ? s + ' (current)' : '→ ' + s}</option>`).join('')}</select>
+      ${detail}
+      <input data-field="note" placeholder="note (required)" value="${esc(d.note)}">
+      <button class="ok" data-act="apply" ${ready ? '' : 'disabled'}>Apply</button>
+    </div>${msg}`;
+}
+
+async function act(claimId, button) {
+  const d = drafts[claimId];
+  button.disabled = true;
+  try {
+    const res = await fetch(`/api/claims/${claimId}/state`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(d) });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error);
+    msgs[claimId] = { text: `${d.to}: ${body.seqs.map((n) => 'ev-' + String(n).padStart(4, '0')).join(', ')}` };
+    delete drafts[claimId];
+    await poll();
+  } catch (err) {
+    // fetch rejects with a TypeError only when the server cannot be reached (stopped or restarted).
+    const down = err instanceof TypeError;
+    msgs[claimId] = { text: down ? `viewer server not reachable at ${location.host}: start it with npm run viewer -- --write` : err.message, err: true };
+  }
+  render();
+}
+
+function renderChunks() {
+  const versions = [...new Set(data.chunks.map((c) => c.version))];
+  const cards = data.chunks.filter((c) => !filters.version || c.version === filters.version).map((ch) => {
+    // Claim spans that fall inside this paragraph, highlighted in place.
+    const inside = data.claims.flatMap((c) => c.spans.filter((s) => s.version === ch.version && s.start >= ch.start && s.end <= ch.end).map((s) => ({ c, s })))
+      .sort((a, b) => a.s.start - b.s.start);
+    let html = '', at = ch.start;
+    for (const { s } of inside) {
+      if (s.start < at) continue;
+      html += esc(ch.text.slice(at - ch.start, s.start - ch.start)) + '<mark>' + esc(ch.text.slice(s.start - ch.start, s.end - ch.start)) + '</mark>';
+      at = s.end;
+    }
+    html += esc(ch.text.slice(at - ch.start));
+    const gone = ch.inIndex === false;
+    return `<div class="chunk ${gone ? 'gone' : ''}">
+      <h3>${esc(ch.id)} <span class="muted">[${ch.start},${ch.end})</span>${gone ? '<span class="pill contested">deleted from index</span>' : ''}</h3>
+      <p>${html}</p>
+      ${inside.length ? `<div class="tags">${inside.map(({ c }) => `<span class="pill ${c.state}">${esc(c.label)} = ${esc(c.value)}</span>`).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="filters">
+      <select id="f-version"><option value="">all versions</option>${versions.map((v) => `<option ${v === filters.version ? 'selected' : ''}>${v}</option>`).join('')}</select>
+      <span class="muted">${data.chunks.length} paragraph chunks · ${data.ragIndexed ? 'out/rag/index.json present' : 'no RAG index (npm run rag:index)'} · highlighted = claim spans from the log</span>
+    </div>
+    <div class="chunks">${cards}</div>`;
+}
+
+function renderExplain() {
+  const panel = $('#explain');
+  panel.hidden = !exOpen;
+  document.body.classList.toggle('explain-open', exOpen);
+  $('#ex-toggle').setAttribute('aria-expanded', String(exOpen));
+  $('#ex-toggle').textContent = exOpen ? 'explain ▾' : 'explain ▴';
+  document.querySelectorAll('.explain [data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === exLang)));
+  if (!exOpen || !data) return;
+  const e = data.log.find((x) => x.seq === sel);
+  const ex = data.explain ?? { enabled: false, known: {} };
+  $('#ex-model').textContent = ex.enabled ? `${ex.model} · reads this row, its ← chain and the log up to it` : SNAP ? 'snapshot: explanations saved at export time only' : 'off — no ANTHROPIC_API_KEY';
+  if (!e) { $('#ex-title').textContent = 'Explain'; $('#ex-body').textContent = 'Select a log row (or a node in Dependencies) to read the story of that step.'; return; }
+  const key = `${e.raw.eventId}|${exLang}`;
+  $('#ex-title').textContent = `${e.id} · ${e.type} · ${e.label}`;
+  const text = exText[key] ?? ex.known?.[key];
+  if (text) { $('#ex-body').textContent = text; return; }
+  if (exErr[key]) { $('#ex-body').innerHTML = `<span class="msg err">${esc(exErr[key])}</span>`; return; }
+  if (!ex.enabled) {
+    $('#ex-body').innerHTML = SNAP
+      ? '<span class="muted">No explanation was saved for this row before the export.</span>'
+      : '<span class="muted">Put <code>ANTHROPIC_API_KEY=…</code> in a <code>.env</code> (in the checkout that holds the log, or where the viewer runs; git ignores it) and restart the viewer to have Claude Haiku tell the story of each row. Without it the viewer makes no network call.</span>';
+    return;
+  }
+  $('#ex-body').innerHTML = `<span class="muted">asking ${esc(ex.model)}…</span>`;
+  if (!exBusy.has(key)) { clearTimeout(exTimer); exTimer = setTimeout(() => askExplain(e.seq, key), 350); }
+}
+
+async function askExplain(seq, key) {
+  if (exBusy.has(key)) return;
+  exBusy.add(key);
+  try {
+    const res = await fetch('/api/explain', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ seq, lang: key.endsWith('|en') ? 'en' : 'it' }) });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error);
+    exText[key] = body.text;
+  } catch (err) {
+    exErr[key] = err instanceof TypeError ? `viewer server not reachable at ${location.host}` : err.message;
+  } finally {
+    exBusy.delete(key);
+  }
+  renderExplain();
+}
+
+$('#ex-toggle').onclick = () => { exOpen = !exOpen; store.set('dnk-explain-open', exOpen ? '1' : '0'); renderExplain(); };
+document.querySelectorAll('.explain [data-lang]').forEach((b) => b.onclick = () => { exLang = b.dataset.lang; store.set('dnk-explain-lang', exLang); renderExplain(); });
+
+// Edge styles of the Dependencies tab: [colour variable, dash pattern, legend text].
+const EDGE = {
+  structure: ['--muted', '', 'ingested → tree'],
+  extracts: ['--line', '', 'tree → claim (ACL unit)'],
+  'superseded-by': ['--superseded', '', 'superseded by (human resolution)'],
+  'reconfirmed-by': ['--verified', '2 3', 'reconfirmed by (class A)'],
+  conflict: ['--contested', '6 4', 'open conflict: belief → contested'],
+  mentions: ['--accent', '4 3', 'layers 4–6 rest on (excerpt)'],
+  references: ['--accent', '4 3', ''], effect: ['--accent', '4 3', ''], precondition: ['--accent', '4 3', ''],
+};
+const STATE_VAR = { verified: '--verified', proposed: '--proposed', contested: '--contested', superseded: '--superseded', ingested: '--accent' };
+
+function layoutGraph(g) {
+  const W = 172, H = 36, GAP = 8, PITCH = W + 74, TOP = 44;
+  const versions = [...new Set(g.nodes.filter((n) => n.kind === 'claim').map((n) => n.version))].sort();
+  const cols = [['document', 'Source'], ['tree', 'Structure'], ...versions.map((v) => [`claim:${v}`, `Claims ${v}`]), ['entity', 'Entities'], ['policy', 'Policies'], ['workflow', 'Workflow']]
+    .filter(([k]) => g.nodes.some((n) => (n.kind === 'claim' ? `claim:${n.version}` : n.kind) === k));
+  const colOf = (n) => cols.findIndex(([k]) => k === (n.kind === 'claim' ? `claim:${n.version}` : n.kind));
+  const pos = new Map();
+  // Claims: one row per subject key, one column per version, stacked inside a cell.
+  const rows = [...new Set(g.nodes.filter((n) => n.kind === 'claim').map((n) => n.row))];
+  let y = TOP;
+  const rowY = [];
+  for (const row of rows) {
+    const cells = cols.map(([k]) => g.nodes.filter((n) => n.kind === 'claim' && n.row === row && `claim:${n.version}` === k));
+    cells.forEach((cell, c) => cell.forEach((n, i) => pos.set(n.id, { x: 16 + c * PITCH, y: y + i * (H + GAP) })));
+    rowY.push([row, y]);
+    y += Math.max(1, ...cells.map((c) => c.length)) * (H + GAP) + 14;
+  }
+  // Everything else sits near the mean height of what it connects to, pushed down to avoid overlaps.
+  const neighbours = (id) => g.edges.flatMap((e) => (e.from === id ? [e.to] : e.to === id ? [e.from] : []));
+  const order = ['tree', 'document', 'entity', 'policy', 'workflow'];
+  for (const kind of order) {
+    let floor = TOP;
+    const placed = g.nodes.filter((n) => n.kind === kind).map((n) => {
+      const ys = neighbours(n.id).map((id) => pos.get(id)?.y).filter((v) => v !== undefined);
+      return { n, want: ys.length ? ys.reduce((a, b) => a + b, 0) / ys.length : TOP };
+    }).sort((a, b) => a.want - b.want);
+    for (const { n, want } of placed) {
+      const yy = Math.max(want, floor);
+      pos.set(n.id, { x: 16 + colOf(n) * PITCH, y: yy });
+      floor = yy + H + GAP * 2;
+    }
+  }
+  const height = Math.max(y, ...[...pos.values()].map((p) => p.y + H)) + 20;
+  return { pos, cols, rowY, W, H, PITCH, width: 16 + cols.length * PITCH, height };
+}
+
+function renderGraph() {
+  const g = data.graph;
+  if (!g.nodes.length) return '<p class="empty">Nothing to draw yet — the graph starts at <code>npm run ingest:v8</code>.</p>';
+  const L = layoutGraph(g);
+  const near = new Set(gsel ? [gsel, ...g.edges.flatMap((e) => (e.from === gsel ? [e.to] : e.to === gsel ? [e.from] : []))] : []);
+  const markers = Object.entries(EDGE).map(([k, [c]]) =>
+    `<marker id="m-${k}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill: var(${c})"/></marker>`).join('');
+  const edges = g.edges.map((e) => {
+    const a = L.pos.get(e.from), b = L.pos.get(e.to);
+    if (!a || !b) return '';
+    const right = b.x > a.x, same = b.x === a.x;
+    const x1 = right || same ? a.x + L.W : a.x, x2 = right ? b.x : b.x + L.W;
+    const y1 = a.y + L.H / 2, y2 = b.y + L.H / 2;
+    const bend = same ? 46 : Math.max(30, Math.abs(x2 - x1) / 2);
+    const c1 = right || same ? x1 + bend : x1 - bend, c2 = right ? x2 - bend : x2 + bend;
+    const [col, dash] = EDGE[e.kind];
+    const dim = gsel && !(e.from === gsel || e.to === gsel) ? 'dim' : '';
+    return `<path class="edge ${dim}" d="M${x1},${y1} C${c1},${y1} ${c2},${y2} ${x2},${y2}" style="stroke: var(${col})" ${dash ? `stroke-dasharray="${dash}"` : ''} marker-end="url(#m-${e.kind})"><title>${esc(e.kind)}</title></path>`;
+  }).join('');
+  const nodes = g.nodes.map((n) => {
+    const p = L.pos.get(n.id);
+    const dim = gsel && !near.has(n.id) ? 'dim' : '';
+    const label = n.label.length > 22 ? n.label.slice(0, 21) + '…' : n.label;
+    const detail = n.detail.length > 30 ? n.detail.slice(0, 29) + '…' : n.detail;
+    return `<g class="node ${n.excerpt ? 'excerpt' : ''} ${dim}" data-node="${esc(n.id)}" transform="translate(${p.x},${p.y})">
+      <rect width="${L.W}" height="${L.H}" rx="6" style="stroke: var(${STATE_VAR[n.state] ?? '--line'})${n.id === gsel ? '; stroke-width: 3' : ''}"/>
+      <text x="8" y="15">${esc(label)}</text><text class="d" x="8" y="29">${esc(detail)}</text>
+      <title>${esc(n.label)} · ${esc(n.state)}${n.excerpt ? ' · pre-computed excerpt, not in the log' : ''}\n${esc(n.detail)}</title></g>`;
+  }).join('');
+  const heads = L.cols.map(([, t], c) => `<text class="col" x="${16 + c * L.PITCH}" y="22">${esc(t)}</text>`).join('');
+  const rowLabels = L.rowY.map(([row, yy]) => `<line x1="8" x2="${L.width}" y1="${yy - 7}" y2="${yy - 7}" style="stroke: var(--line)"/>`).join('');
+  const legend = Object.entries(EDGE).filter(([, [, , t]]) => t).map(([, [c, dash, t]]) =>
+    `<span><i style="border-top: 2px ${dash ? 'dashed' : 'solid'} var(${c})"></i>${t}</span>`).join('') +
+    ['verified', 'proposed', 'contested', 'superseded'].map((st) => `<span class="pill ${st}">${st}</span>`).join('') +
+    '<span>dashed box = layers 4–6, pre-computed excerpt</span>';
+  const n = g.nodes.find((x) => x.id === gsel);
+  const claim = n?.kind === 'claim' ? data.claims.find((c) => `claim:${c.claimId}` === n.id) : null;
+  const info = n ? `<strong class="mono">${esc(n.label)}</strong> · ${esc(n.kind)} · <span class="pill ${n.state}">${esc(n.state)}</span> · ${esc(n.detail)}${claim ? ` · ${esc(claim.subjectKey)} <q>${esc(claim.spans[0]?.text)}</q>` : ''}${n.excerpt ? ' · <em>excerpt, not in the log</em>' : ''}`
+    : '<span class="muted">Click a node to see what it depends on and what depends on it. Each column is a layer; each claim row is one subject key.</span>';
+  return `<div class="legend">${legend}</div><div class="nodeinfo">${info}</div>
+    <div class="graph-wrap"><svg width="${L.width}" height="${L.height}" viewBox="0 0 ${L.width} ${L.height}"><defs>${markers}</defs>${heads}${rowLabels}${edges}${nodes}</svg></div>`;
+}
+
+function render() {
+  if (!data) return;
+  const y = scrollY;
+  document.querySelectorAll('nav button').forEach((b) => b.classList.toggle('later', Boolean(later(b.dataset.tab))));
+  $('#main').innerHTML = later(tab) ? notYet(tab) : { log: renderLog, claims: renderClaims, chunks: renderChunks, graph: renderGraph }[tab]();
+  document.querySelectorAll('.node').forEach((el) => el.onclick = (ev) => {
+    ev.stopPropagation();
+    gsel = gsel === el.dataset.node ? null : el.dataset.node;
+    const last = data.graph.nodes.find((n) => n.id === gsel)?.lastSeq;
+    if (last) sel = last;
+    render();
+  });
+  $('.graph-wrap svg')?.addEventListener('click', () => { if (gsel) { gsel = null; render(); } });
+  scrollTo(0, y);
+  $('#f-layer')?.addEventListener('change', (e) => { filters.layer = e.target.value; render(); });
+  $('#f-state')?.addEventListener('change', (e) => { filters.state = e.target.value; render(); });
+  $('#f-version')?.addEventListener('change', (e) => { filters.version = e.target.value; render(); });
+  document.querySelectorAll('.review').forEach((box) => {
+    const id = box.dataset.claim;
+    const d = drafts[id];
+    box.querySelectorAll('[data-field]').forEach((el) => {
+      // Selects re-render (they change what else is shown); the note only re-checks the Apply button.
+      if (el.tagName === 'SELECT') el.onchange = () => { d[el.dataset.field] = el.value; if (el.dataset.field === 'to') d.successor = ''; delete msgs[id]; render(); };
+      else el.oninput = () => { d.note = el.value; box.querySelector('[data-act=apply]').disabled = !(d.to !== byId(id).state && d.note.trim() && (d.to !== 'superseded' || d.successor)); };
+    });
+    box.querySelector('[data-act=apply]').onclick = (e) => act(id, e.target);
+  });
+  document.querySelectorAll('tr.ev').forEach((r) => r.onclick = () => {
+    const s = Number(r.dataset.seq);
+    sel = sel === s ? null : s;
+    render();
+    $('.docpanel mark')?.scrollIntoView({ block: 'center' });
+  });
+  const range = $('#at');
+  range.max = data.total;
+  range.value = data.at;
+  $('#at-label').textContent = `${pad(data.at)} / ${pad(data.total)}`;
+  $('#live').setAttribute('aria-pressed', String(live()));
+  renderExplain();
+}
+
+$('#at').oninput = (e) => { const v = Number(e.target.value); at = data && v >= data.total ? null : v; poll(true); };
+$('#live').onclick = () => { at = null; poll(true); };
+
+/** The state at row `at`: from the server, or from the snapshot embedded by --export. */
+async function getState() {
+  if (SNAP) {
+    const n = at === null ? SNAP.total : at;
+    return JSON.stringify({ ...SNAP, ...SNAP.claimsBySeq?.[n], at: n, claimsBySeq: undefined });
+  }
+  const res = await fetch('/api/state' + (at === null ? '' : `?seq=${at}`));
+  const text = await res.text();
+  if (!res.ok) throw new Error(text);
+  return text;
+}
+
+let last = '';
+async function poll() {
+  try {
+    const text = await getState();
+    if (text !== last) {
+      const prev = data;
+      data = JSON.parse(text);
+      seen = prev ? prev.log.length : data.log.length;
+      // Segment 1 has no log yet: open on the RAG chunks.
+      if (!prev && tab === 'log' && !data.log.length && !later('chunks')) selectTab('chunks');
+      if (sel && sel > data.log.length) sel = null;
+      last = text;
+      render();
+    }
+    const mode = SNAP ? 'snapshot (offline)' : `live · ${data.writable ? 'WRITE MODE' : 'read-only'}`;
+    $('#status').textContent = `${data.log.length} events · ${mode}` + (data.warnings.length ? ` · ${data.warnings.length} claim event(s) refused by transition(): ${data.warnings[0]}` : '');
+  } catch (err) {
+    $('#status').textContent = err instanceof TypeError ? 'server not reachable' : 'error: ' + err.message;
+  }
+}
+poll();
+if (!SNAP) setInterval(poll, 1500);
+</script>
+</body>
+</html>

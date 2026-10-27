@@ -3,7 +3,7 @@
 Traduzione italiana di `03-walkthrough-script.md`; in caso di divergenza prevale l'inglese.
 
 Codemotion Milan 2026 · mer 28 ott 2026, 15:20–16:40 CET · Luca Bianchi
-Documento di accompagnamento a `01-run-sheet.md` (orari, intervalli di slide), `00-running-example.md` (l'esempio: valori, span, fixture, checkpoint) e `CLAUDE_CODE_INSTRUCTIONS.md` §7 (script npm, file di fallback). Inglese, revisione 4, 27 ott 2026.
+Documento di accompagnamento a `01-run-sheet.md` (orari, intervalli di slide), `00-running-example.md` (l'esempio: valori, span, fixture, checkpoint) e `AGENTS.md` §11 (script npm, file di fallback). Inglese, revisione 4, 27 ott 2026.
 
 Tutti gli id di evento (`ev-0007`), gli id di claim (`clm-ricavi2m`), gli id di batch, gli hash, i model id e le soglie dell'harness in questo script sono **illustrativi**. Gli offset sono quelli reali dei file di fixture (`fixtures/documents/manifest.json`). Il repository stampa i propri id deterministici; ciò che deve coincidere sono le forme e i conteggi.
 

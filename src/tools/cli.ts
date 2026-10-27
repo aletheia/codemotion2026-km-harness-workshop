@@ -1,5 +1,6 @@
-// Shared CLI plumbing: argument lookup and the one-line-on-stderr error contract.
+// Shared CLI plumbing: argument lookup, the narration line and the one-line-on-stderr error contract.
 import { EventRejected, LogInvalid } from '../events/log';
+import { narrate } from './narration';
 
 export function argValue(argv: readonly string[], name: string): string | undefined {
   const i = argv.indexOf(`--${name}`);
@@ -10,6 +11,7 @@ export const hasFlag = (argv: readonly string[], name: string): boolean => argv.
 
 /** Exit codes: 1 usage/unexpected, 2 rejected by a domain rule, 3 log invalid. */
 export async function run(name: string, main: () => void | Promise<void>): Promise<void> {
+  narrate(process.env.npm_lifecycle_event);
   try {
     await main();
   } catch (err) {

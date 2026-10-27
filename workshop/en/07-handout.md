@@ -1,6 +1,6 @@
 # Documents Are Not Knowledge — one-page handout
 
-Luca Bianchi · Codemotion Milan, 28 Oct 2026 · Repository: `<repository URL — TBD>` · Handbook: `handbook/` in the repository · Stack: TypeScript (Node ≥ 20), offline, every LLM call replayed from fixtures.
+Luca Bianchi · Codemotion Milan, 28 Oct 2026 · Repository: https://github.com/aletheia/codemotion2026-km-harness-workshop (tags `ws-seg1` … `ws-seg6`: the code at the end of each segment; `ws-final`: with `npm run dry-run`) · Stack: TypeScript (Node ≥ 20), offline, every LLM call replayed from fixtures.
 
 **The idea in one line.** A knowledge base is a replayable projection over an immutable log of events about Claims — assertions with identity, span-level provenance and a lifecycle — not a database to be migrated. Agents propose; the harness verifies only on evidence already in the log; humans decide conflicts and novelty.
 

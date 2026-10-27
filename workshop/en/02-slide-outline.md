@@ -1,5 +1,5 @@
 # Slide-by-slide outline — "Documents Are Not Knowledge: Modelling Extraction as an Event-Driven Domain"
-Revision 4, 27 Oct 2026 (English; running example: art. 2477 c.c., see `00-running-example.md`). Codemotion template, 16:9, Codemotion font, no cover slide. 31 visible slides, one idea each. Every live slide (3, 4, 5, 7, 10, 13, 15, 19, 20, 21, 23, 24, 25, 26, 27, 29) is followed by a hidden slide holding a screenshot of the corresponding `fallback/segN/` output; the hidden slide is shown only if the live command fails. All thresholds, counts and percentages of the harness are illustrative, as in the handbook; the dates and amounts of art. 2477 are the official text (Normattiva).
+Revision 4, 27 Oct 2026 (English; running example: art. 2477 c.c., see `00-running-example.md`). Codemotion template, 16:9, Codemotion font, no cover slide. 33 visible slides (31 numbered, plus 5a from `02c-phase-explainers.md` and 6a), one idea each. Every live slide (3, 4, 5, 7, 10, 13, 15, 19, 20, 21, 23, 24, 25, 26, 27, 29) is followed by a hidden slide holding a screenshot of the corresponding `fallback/segN/` output; the hidden slide is shown only if the live command fails. All thresholds, counts and percentages of the harness are illustrative, as in the handbook; the dates and amounts of art. 2477 are the official text (Normattiva).
 
 ## Slide index
 
@@ -11,6 +11,7 @@ Revision 4, 27 Oct 2026 (English; running example: art. 2477 c.c., see `00-runni
 | 4 | 1 | Failure (b): no retraction | live + screenshot |
 | 5 | 1 | Failure (c): no per-layer evaluation | live + screenshot |
 | 6 | 2 | Six entities: identity and invariants | table |
+| 6a | 2 | Six layers: art. 2477 from text to decision | table |
 | 7 | 2 | Claim as an aggregate: Spans inside, absolute coordinates, version | diagram |
 | 8 | 2 | Domain-design concepts used and their effect | table |
 | 9 | 2 | Lifecycle: the state machine | diagram |
@@ -104,6 +105,24 @@ Under the table: *Source: Normattiva, R.D. 262/1942, art. 2477, article versions
 
 **Speaker notes.** Six entities, read from the top. A Document belongs to a lineage, here `cc-art2477`, and its versions are values: label v8 or v9, content hash, effective date. A Span is a value object, a half-open character interval in absolute document coordinates with the version attached, and it never exists on its own. A Claim is the aggregate root: its identity is a deterministic hash of document, version, canonical subject key and normalized value, so the same assertion extracted twice has the same id. The subject key is the canonical name of a quantity, `ricavi.limite`, `dipendenti.limite`, resolved through a hand-maintained catalogue with synonyms. Entity, Policy and WorkflowStep sit on top and each references only verified claims or policies. These invariants are what the log lets you verify after the fact.
 
+### Slide 6a — Six layers: art. 2477 from text to decision
+**Point.** A layer is one level of knowledge derived from the level below; following one article through all six makes the word concrete before it is used.
+
+**On slide.** Definition line, then the table. *Layer = one level of knowledge with its own artifacts, its own extractor, its own events and its own golden set. Layer n reads only what layer n − 1 has verified.*
+
+| # | Layer | What it holds | Art. 2477, version 8 | Lets the next layer start |
+| --- | --- | --- | --- | --- |
+| 1 | Source | document versions, immutable, with a validity period | `cc-art2477@v8`, in force 16 Mar – 17 Jun 2019 | `DocumentVersionIngested` |
+| 2 | Structure | the section tree: commi, notes, header, with offsets | `tree-v8`: header, c1, abrogato (note), c2 … c6 | `StructureVerified` |
+| 3 | Claims | one assertion: subject key, normalized value, span | `ricavi.limite` = 2,000,000 EUR, c2 `[1067, 1126)`: "ricavi delle vendite e delle prestazioni: 2 milioni di euro" | `ClaimVerified` |
+| 4 | Entities | who and what the claims talk about, resolved to the catalogue | `organo-di-controllo`, `revisore`, `societa-srl` | `EntityResolved` |
+| 5 | Policies | a rule: condition / effect / exception, with applicability | `nomina-obbligatoria@v8`: 2 consecutive years over at least one limit → appointment mandatory | `PolicyVerified` |
+| 6 | Workflow | executable steps that apply the policies to one case | `obbligo-nomina`: "mandatory for this s.r.l. on 30 Apr 2019?" → yes | `WorkflowStepVerified` |
+
+Small tag under the table: *live today: layers 1–3; layers 4–6 shown as a pre-computed excerpt (slide 16).*
+
+**Speaker notes.** I will say "layer" a lot, so here is what I mean, on our article. Read the table from the top. Source is the text as published, version 8, with the dates it was in force; nothing is interpreted yet. Structure is the shape of that text: the commi, the abrogated comma kept as a note, the header; still no meaning, only where things are. Claims is the first layer that asserts something: the revenue threshold is two million euro, and here is the exact sentence that says so. Entities says who those claims are about: the control body, the auditor, the s.r.l. Policies turns the claims into a rule: if for two consecutive years at least one limit is exceeded, the appointment is mandatory. Workflow makes the rule executable for one company on one date. The column on the right is the whole contract: a layer starts only from the verified events of the one below. That is why, in a minute, Claims will wait for me to verify the tree. And it is why the failure of slide 5 has a name now: a one-shot extraction jumps from Source to Claims in one opaque step, so when a value is wrong nobody can say which layer broke. Today we run the first three layers live; the last three come as an excerpt.
+
 ### Slide 7 — Claim as an aggregate: Spans inside, absolute coordinates, version
 **Point.** Provenance cannot be lost because a Span is a value inside the Claim aggregate, not a nullable column elsewhere.
 
@@ -170,9 +189,9 @@ Under the table one line: *Alternative not chosen: deterministic merge / CRDT / 
 ### Slide 12 — Context map: six contexts, ACL, log, harness
 **Point.** Each layer is a bounded context that consumes only the verified events of the previous one, through an ACL, and all of them share one log.
 
-**Diagram.** Across the top, six boxes in a row: "1 Source", "2 Structure", "3 Claims", "4 Entities", "5 Policies", "6 Workflow". Between each adjacent pair a small box labelled "ACL" with an arrow entering it from the left box labelled "Verified events" and an arrow leaving it into the right box. Below the row, one wide box spanning the full width: "Append-only log (shared infrastructure)". A double-headed vertical arrow from each of the six boxes down to the log. At the bottom right, a box "Harness" with an arrow from the log labelled "decision events" and an arrow back to the log labelled "ExtractorVersionPromoted / BatchRejected". No arrow between non-adjacent layers.
+**Diagram.** Across the top, six boxes in a row: "1 Source", "2 Structure", "3 Claims", "4 Entities", "5 Policies", "6 Workflow". Under each name, in small type, the art. 2477 example of slide 6a (`cc-art2477@v8`, `tree-v8`, `ricavi.limite` = 2,000,000, `organo-di-controllo`, `nomina-obbligatoria@v8`, `obbligo-nomina`); on each arrow the concrete event: `StructureVerified`, `ClaimVerified`, `EntityResolved`, `PolicyVerified`. Between each adjacent pair a small box labelled "ACL" with an arrow entering it from the left box labelled "Verified events" and an arrow leaving it into the right box. Below the row, one wide box spanning the full width: "Append-only log (shared infrastructure)". A double-headed vertical arrow from each of the six boxes down to the log. At the bottom right, a box "Harness" with an arrow from the log labelled "decision events" and an arrow back to the log labelled "ExtractorVersionPromoted / BatchRejected". No arrow between non-adjacent layers.
 
-**Speaker notes.** Six bounded contexts in order: source, structure, claims, entities, policies, executable workflow. The Harness is a seventh context; the log is infrastructure shared by all of them, not a context. The single contract between layers, layer n consumes only verified artifacts of layer n minus 1, lives in the ACL at each boundary. Each ACL does three things: filters, accepting only verified events; translates, from the upstream event shape to the context's own input type; and stamps causation, so the id of the consumed event becomes the causation id of everything produced from it. That contract is verifiable from the log by following causation ids: every `ClaimProposed` must point at a `StructureVerified`. Today we run the first three layers live and show the last three as a pre-computed excerpt.
+**Speaker notes.** Six bounded contexts in order: source, structure, claims, entities, policies, executable workflow. The Harness is a seventh context; the log is infrastructure shared by all of them, not a context. The single contract between layers, layer n consumes only verified artifacts of layer n minus 1, lives in the ACL at each boundary. Each ACL does three things: filters, accepting only verified events; translates, from the upstream event shape to the context's own input type; and stamps causation, so the id of the consumed event becomes the causation id of everything produced from it. That contract is verifiable from the log by following causation ids: every `ClaimProposed` must point at a `StructureVerified`. These are the six layers of slide 6a, now drawn as contexts. Today we run the first three layers live and show the last three as a pre-computed excerpt.
 
 ### Slide 13 — ACL Structure → Claims in five steps
 **Point.** The ACL translates shape and coordinates, nothing else, and that is where the provenance invariant is enforced.

@@ -2,7 +2,7 @@
 
 Traduzione italiana di `07-handout.md`; in caso di divergenza prevale l'inglese.
 
-Luca Bianchi · Codemotion Milano, 28 ott 2026 · Repository: `<URL del repository — da definire>` · Handbook: `handbook/` nel repository · Stack: TypeScript (Node ≥ 20), offline, ogni chiamata LLM riprodotta da fixture.
+Luca Bianchi · Codemotion Milano, 28 ott 2026 · Repository: https://github.com/aletheia/codemotion2026-km-harness-workshop (tag `ws-seg1` … `ws-seg6`: il codice alla fine di ogni segmento; `ws-final`: con `npm run dry-run`) · Stack: TypeScript (Node ≥ 20), offline, ogni chiamata LLM riprodotta da fixture.
 
 **L'idea in una riga.** Una base di conoscenza è una proiezione rigiocabile su un log immutabile di eventi relativi a Claim — asserzioni con identità, provenienza a livello di span e un ciclo di vita — non un database da migrare. Gli agenti propongono; l'harness verifica solo su evidenza già presente nel log; gli umani decidono conflitti e novità.
 

@@ -38,7 +38,8 @@ Mattina di mercoledì 28 ottobre; in sala entro le 15:05.
 
 Repository e demo
 
-- [ ] `git clone` in una directory pulita, `npm ci` con la rete spenta, `npm run dry-run` verde tre volte di seguito, identico byte per byte (`CLAUDE_CODE_INSTRUCTIONS.md` §11).
+- [ ] `git clone` in una directory pulita, `npm ci` con la rete spenta, `npm run dry-run` verde tre volte di seguito, identico byte per byte (`AGENTS.md` §14).
+- [ ] I tag `ws-seg1` … `ws-seg6` e `ws-final` esistono sul remote (`git ls-remote --tags origin`); i vecchi tag `seg*-start/done` e `workshop-v1` (albero Casa Protetta) sono cancellati. Prova generale dello step 9 di `PROMPTS.md` eseguita una volta: la sequenza di checkout termina con il log a seq 48. Stato finale: `git status` pulito, `ws-seg1` in checkout, log vuoto, `rag:index` eseguito.
 - [ ] `fixtures/documents/` contiene `cc-art2477-v7.txt`, `cc-art2477-v8.txt`, `cc-art2477-v9.txt`, `manifest.json`, `compliance-register.csv`; gli hash dei contenuti coincidono con `manifest.json`.
 - [ ] `fixtures/llm/` completo per `structure@v1`, `claims@v1`, `claims@v2` su v8 e v9; il replayer fallisce in modo esplicito su una fixture mancante (verificare rinominandone una ed eseguendo `npm run extract:claims-v8`).
 - [ ] `fallback/seg1` … `fallback/seg6` presenti e non vuoti; aprire la cartella in una seconda scheda del terminale prima delle 15:20.
@@ -49,7 +50,7 @@ Repository e demo
 
 Slide
 
-- [ ] Template ufficiale Codemotion (mail del 19 ott), 16:9, font Codemotion, nessuna slide di copertina; 31 slide visibili.
+- [ ] Template ufficiale Codemotion (mail del 19 ott), 16:9, font Codemotion, nessuna slide di copertina; 33 slide visibili (31 + 5a + 6a).
 - [ ] Slide nascosta con screenshot dopo ogni slide live (3, 4, 5, 7, 10, 13, 15, 19, 20, 21, 23–27, 29) con l'output `fallback/` corrispondente.
 - [ ] La slide 2 (il dominio) mostra le tre versioni con le date di entrata in vigore e la fonte Normattiva.
 - [ ] Slide 31: tre decisioni e costi; QR all'handout; QR al repository; entrambi scansionati una volta.

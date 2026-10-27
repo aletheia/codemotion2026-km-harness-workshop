@@ -36,7 +36,8 @@ Morning of Wed 28 Oct; be in the room by 15:05.
 
 Repository and demo
 
-- [ ] `git clone` into a clean directory, `npm ci` with the network off, `npm run dry-run` green three times in a row, byte-identical (`CLAUDE_CODE_INSTRUCTIONS.md` §11).
+- [ ] `git clone` into a clean directory, `npm ci` with the network off, `npm run dry-run` green three times in a row, byte-identical (`AGENTS.md` §14).
+- [ ] Tags `ws-seg1` … `ws-seg6` and `ws-final` exist on the remote (`git ls-remote --tags origin`); the old `seg*-start/done` and `workshop-v1` tags (Casa Protetta tree) are deleted. Stage rehearsal of `PROMPTS.md` step 9 run once: the checkout sequence ends with the log at seq 48. Final state: `git status` clean, `ws-seg1` checked out, empty log, `rag:index` done.
 - [ ] `fixtures/documents/` holds `cc-art2477-v7.txt`, `cc-art2477-v8.txt`, `cc-art2477-v9.txt`, `manifest.json`, `compliance-register.csv`; the content hashes match `manifest.json`.
 - [ ] `fixtures/llm/` complete for `structure@v1`, `claims@v1`, `claims@v2` on v8 and v9; the replayer fails loudly on a missing fixture (verify by renaming one and running `npm run extract:claims-v8`).
 - [ ] `fallback/seg1` … `fallback/seg6` present and non-empty; open the folder in a second terminal tab before 15:20.
@@ -47,7 +48,7 @@ Repository and demo
 
 Slides
 
-- [ ] Official Codemotion template (19 Oct mail), 16:9, Codemotion font, no cover slide; 31 visible slides.
+- [ ] Official Codemotion template (19 Oct mail), 16:9, Codemotion font, no cover slide; 33 visible slides (31 + 5a + 6a).
 - [ ] Hidden screenshot slide after every live slide (3, 4, 5, 7, 10, 13, 15, 19, 20, 21, 23–27, 29) holding the corresponding `fallback/` output.
 - [ ] Slide 2 (the domain) shows the three versions with their dates of entry into force and the Normattiva source.
 - [ ] Slide 31: three decisions and costs; QR to the handout; QR to the repository; both scanned once.

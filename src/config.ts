@@ -57,6 +57,6 @@ export const config = {
 
 export function occurredAt(seq: number, env: NodeJS.ProcessEnv = process.env): string {
   if (env.DNK_CLOCK === 'real') return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
-  // TODO(luca): 03-walkthrough-script.md shows seq 7 at 13:37:12Z; CLAUDE.md §1.4 (base + seq seconds) gives 13:37:07Z. Kept CLAUDE.md.
+  // TODO(luca): 03-walkthrough-script.md shows seq 7 at 13:37:12Z; AGENTS.md §1.4 (base + seq seconds) gives 13:37:07Z. Kept AGENTS.md.
   return new Date(Date.parse(config.clock.base) + seq * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
 }

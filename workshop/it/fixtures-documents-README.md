@@ -2,7 +2,7 @@
 
 Traduzione italiana di `fixtures/documents/README.md`; in caso di divergenza prevale l'inglese.
 
-I documenti che il repository ingerisce. Copiare questa cartella così com'è nel repository in `fixtures/documents/`. La specifica dell'esempio (catalogo dei soggetti, claim attese, span, fixture degli estrattori, numeri svolti, checkpoint) è `workshop/00-running-example.md`; questo README descrive solo i file.
+I documenti che il repository ingerisce. Copiare questa cartella così com'è nel repository in `fixtures/documents/`. La specifica dell'esempio (catalogo dei soggetti, claim attese, span, fixture degli estrattori, numeri svolti, checkpoint) è `workshop/en/00-running-example.md`; questo README descrive solo i file.
 
 | File | Contenuto | Caratteri |
 | --- | --- | --- |

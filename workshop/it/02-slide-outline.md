@@ -1,6 +1,6 @@
 # Outline slide per slide — "Documents Are Not Knowledge: Modelling Extraction as an Event-Driven Domain"
 Traduzione italiana di `02-slide-outline.md`; in caso di divergenza prevale l'inglese.
-Revisione 4, 27 ott 2026 (esempio corrente: art. 2477 c.c., vedi `00-running-example.md`). Template Codemotion, 16:9, font Codemotion, nessuna slide di copertina. 31 slide visibili, un'idea ciascuna. Ogni slide live (3, 4, 5, 7, 10, 13, 15, 19, 20, 21, 23, 24, 25, 26, 27, 29) è seguita da una slide nascosta con lo screenshot dell'output corrispondente in `fallback/segN/`; la slide nascosta si mostra solo se il comando live fallisce. Tutte le soglie, i conteggi e le percentuali dell'harness sono illustrativi, come nell'handbook; le date e gli importi dell'art. 2477 sono il testo ufficiale (Normattiva).
+Revisione 4, 27 ott 2026 (esempio corrente: art. 2477 c.c., vedi `00-running-example.md`). Template Codemotion, 16:9, font Codemotion, nessuna slide di copertina. 33 slide visibili (31 numerate, più la 5a di `02c-phase-explainers.md` e la 6a), un'idea ciascuna. Ogni slide live (3, 4, 5, 7, 10, 13, 15, 19, 20, 21, 23, 24, 25, 26, 27, 29) è seguita da una slide nascosta con lo screenshot dell'output corrispondente in `fallback/segN/`; la slide nascosta si mostra solo se il comando live fallisce. Tutte le soglie, i conteggi e le percentuali dell'harness sono illustrativi, come nell'handbook; le date e gli importi dell'art. 2477 sono il testo ufficiale (Normattiva).
 
 ## Indice delle slide
 
@@ -12,6 +12,7 @@ Revisione 4, 27 ott 2026 (esempio corrente: art. 2477 c.c., vedi `00-running-exa
 | 4 | 1 | Guasto (b): nessuna ritrattazione | live + screenshot |
 | 5 | 1 | Guasto (c): nessuna valutazione per livello | live + screenshot |
 | 6 | 2 | Sei entità: identità e invarianti | tabella |
+| 6a | 2 | Sei livelli: l'art. 2477 dal testo alla decisione | tabella |
 | 7 | 2 | Claim come aggregato: Span interni, coordinate assolute, versione | diagramma |
 | 8 | 2 | Concetti di domain design usati e il loro effetto | tabella |
 | 9 | 2 | Ciclo di vita: la macchina a stati | diagramma |
@@ -105,6 +106,24 @@ Sotto la tabella: *Fonte: Normattiva, R.D. 262/1942, art. 2477, versioni dell'ar
 
 **Note per lo speaker.** Sei entità, lette dall'alto. Un Document appartiene a una lineage, qui `cc-art2477`, e le sue versioni sono valori: etichetta v8 o v9, hash del contenuto, data di efficacia. Uno Span è un value object, un intervallo semiaperto di caratteri in coordinate assolute del documento con la versione allegata, e non esiste mai da solo. Una Claim è la radice dell'aggregato: la sua identità è un hash deterministico di documento, versione, chiave di soggetto canonica e valore normalizzato, così la stessa asserzione estratta due volte ha lo stesso id. La chiave di soggetto è il nome canonico di una grandezza, `ricavi.limite`, `dipendenti.limite`, risolto attraverso un catalogo mantenuto a mano con i sinonimi. Entity, Policy e WorkflowStep stanno sopra e ciascuna riferisce solo claim o policy verified. Questi invarianti sono ciò che il log permette di verificare a posteriori.
 
+### Slide 6a — Sei livelli: l'art. 2477 dal testo alla decisione
+**Punto.** Un livello è un grado di conoscenza ricavato dal livello sottostante; seguire un solo articolo attraverso tutti e sei rende concreta la parola prima di usarla.
+
+**Sulla slide.** Riga di definizione, poi la tabella. *Livello = un grado di conoscenza con i propri artefatti, il proprio estrattore, i propri eventi e il proprio golden set. Il livello n legge solo ciò che il livello n − 1 ha verificato.*
+
+| # | Livello | Cosa contiene | Art. 2477, versione 8 | Fa partire il livello successivo |
+| --- | --- | --- | --- | --- |
+| 1 | Source | versioni del documento, immutabili, con periodo di vigenza | `cc-art2477@v8`, in vigore dal 16 mar al 17 giu 2019 | `DocumentVersionIngested` |
+| 2 | Structure | l'albero delle sezioni: commi, note, intestazione, con gli offset | `tree-v8`: header, c1, abrogato (note), c2 … c6 | `StructureVerified` |
+| 3 | Claims | un'asserzione: chiave di soggetto, valore normalizzato, span | `ricavi.limite` = 2.000.000 EUR, c2 `[1067, 1126)`: "ricavi delle vendite e delle prestazioni: 2 milioni di euro" | `ClaimVerified` |
+| 4 | Entities | chi e che cosa le claim nominano, risolti sul catalogo | `organo-di-controllo`, `revisore`, `societa-srl` | `EntityResolved` |
+| 5 | Policies | una regola: condizione / effetto / eccezione, con applicabilità | `nomina-obbligatoria@v8`: per 2 esercizi consecutivi oltre almeno un limite → nomina obbligatoria | `PolicyVerified` |
+| 6 | Workflow | passi eseguibili che applicano le policy a un caso | `obbligo-nomina`: "obbligatoria per questa s.r.l. il 30 apr 2019?" → sì | `WorkflowStepVerified` |
+
+Etichetta piccola sotto la tabella: *oggi live: livelli 1–3; livelli 4–6 come estratto precomputato (slide 16).*
+
+**Note per lo speaker.** Dirò "livello" molte volte, quindi ecco cosa intendo, sul nostro articolo. Leggete la tabella dall'alto. Source è il testo così come pubblicato, versione 8, con le date in cui è stato in vigore; nulla è ancora interpretato. Structure è la forma di quel testo: i commi, il comma abrogato tenuto come nota, l'intestazione; ancora nessun significato, solo dove stanno le cose. Claims è il primo livello che asserisce qualcosa: la soglia dei ricavi è due milioni di euro, ed ecco la frase esatta che lo dice. Entities dice di chi parlano quelle claim: l'organo di controllo, il revisore, la s.r.l. Policies trasforma le claim in una regola: se per due esercizi consecutivi almeno un limite è superato, la nomina è obbligatoria. Workflow rende la regola eseguibile per una società a una data. La colonna di destra è tutto il contratto: un livello parte solo dagli eventi verified di quello sotto. Per questo, fra un minuto, Claims aspetterà che io verifichi l'albero. E per questo il guasto della slide 5 adesso ha un nome: un'estrazione in un colpo solo salta da Source a Claims in un unico passo opaco, quindi quando un valore è sbagliato nessuno può dire quale livello si è rotto. Oggi eseguiamo live i primi tre livelli; gli ultimi tre arrivano come estratto.
+
 ### Slide 7 — Claim come aggregato: Span interni, coordinate assolute, versione
 **Punto.** La provenienza non si può perdere perché uno Span è un valore dentro l'aggregato Claim, non una colonna annullabile altrove.
 
@@ -171,9 +190,9 @@ Sotto la tabella una riga: *Alternativa non scelta: merge deterministico / CRDT 
 ### Slide 12 — Context map: sei contesti, ACL, log, harness
 **Punto.** Ogni livello è un bounded context che consuma solo gli eventi verified del precedente, attraverso una ACL, e tutti condividono un solo log.
 
-**Diagramma.** In alto, sei riquadri in fila: "1 Source", "2 Structure", "3 Claims", "4 Entities", "5 Policies", "6 Workflow". Fra ogni coppia adiacente un riquadro piccolo con etichetta "ACL", con una freccia che vi entra dal riquadro di sinistra etichettata "eventi Verified" e una freccia che ne esce verso il riquadro di destra. Sotto la fila, un riquadro largo che occupa tutta la larghezza: "Log append-only (infrastruttura condivisa)". Una freccia verticale a doppia punta da ciascuno dei sei riquadri verso il log. In basso a destra, un riquadro "Harness" con una freccia dal log etichettata "eventi di decisione" e una freccia di ritorno verso il log etichettata "ExtractorVersionPromoted / BatchRejected". Nessuna freccia fra livelli non adiacenti.
+**Diagramma.** In alto, sei riquadri in fila: "1 Source", "2 Structure", "3 Claims", "4 Entities", "5 Policies", "6 Workflow". Sotto ogni nome, in corpo piccolo, l'esempio dell'art. 2477 della slide 6a (`cc-art2477@v8`, `tree-v8`, `ricavi.limite` = 2.000.000, `organo-di-controllo`, `nomina-obbligatoria@v8`, `obbligo-nomina`); su ogni freccia l'evento concreto: `StructureVerified`, `ClaimVerified`, `EntityResolved`, `PolicyVerified`. Fra ogni coppia adiacente un riquadro piccolo con etichetta "ACL", con una freccia che vi entra dal riquadro di sinistra etichettata "eventi Verified" e una freccia che ne esce verso il riquadro di destra. Sotto la fila, un riquadro largo che occupa tutta la larghezza: "Log append-only (infrastruttura condivisa)". Una freccia verticale a doppia punta da ciascuno dei sei riquadri verso il log. In basso a destra, un riquadro "Harness" con una freccia dal log etichettata "eventi di decisione" e una freccia di ritorno verso il log etichettata "ExtractorVersionPromoted / BatchRejected". Nessuna freccia fra livelli non adiacenti.
 
-**Note per lo speaker.** Sei bounded context in ordine: source, structure, claims, entities, policies, executable workflow. L'Harness è un settimo contesto; il log è infrastruttura condivisa da tutti, non un contesto. L'unico contratto fra livelli, il livello n consuma solo artefatti verified del livello n meno 1, vive nell'ACL a ogni confine. Ogni ACL fa tre cose: filtra, accettando solo eventi verified; traduce, dalla forma dell'evento di monte al tipo di input proprio del contesto; e marca la causazione, così l'id dell'evento consumato diventa l'id di causazione di tutto ciò che ne viene prodotto. Quel contratto è verificabile dal log seguendo gli id di causazione: ogni `ClaimProposed` deve puntare a una `StructureVerified`. Oggi eseguiamo live i primi tre livelli e mostriamo gli ultimi tre come estratto precomputato.
+**Note per lo speaker.** Sei bounded context in ordine: source, structure, claims, entities, policies, executable workflow. L'Harness è un settimo contesto; il log è infrastruttura condivisa da tutti, non un contesto. L'unico contratto fra livelli, il livello n consuma solo artefatti verified del livello n meno 1, vive nell'ACL a ogni confine. Ogni ACL fa tre cose: filtra, accettando solo eventi verified; traduce, dalla forma dell'evento di monte al tipo di input proprio del contesto; e marca la causazione, così l'id dell'evento consumato diventa l'id di causazione di tutto ciò che ne viene prodotto. Quel contratto è verificabile dal log seguendo gli id di causazione: ogni `ClaimProposed` deve puntare a una `StructureVerified`. Sono i sei livelli della slide 6a, ora disegnati come contesti. Oggi eseguiamo live i primi tre livelli e mostriamo gli ultimi tre come estratto precomputato.
 
 ### Slide 13 — ACL Structure → Claims in cinque passi
 **Punto.** L'ACL traduce forma e coordinate, nient'altro, ed è lì che l'invariante di provenienza viene applicato.

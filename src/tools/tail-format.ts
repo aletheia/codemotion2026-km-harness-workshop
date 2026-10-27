@@ -1,4 +1,4 @@
-// The tail line (CLAUDE.md §10):
+// The tail line (AGENTS.md §10):
 //   NNNN · Type · actor.kind(actor.id) · layer · label · ← ev-NNNN  evidence: …
 // `★` replaces `·` after the seq on decision events; evidence is summarised in ≤ 60 characters.
 // Display ids (§13): events are ev-<seq, 4 digits>; the causation column shows the ev- of the cause.
