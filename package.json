@@ -1,0 +1,33 @@
+{
+  "name": "codemotion-harness",
+  "version": "1.0.0",
+  "description": "Event-sourced knowledge-extraction harness for the Casa Protetta workshop (offline, fixture-replayed).",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=20.19.0 <21" },
+  "scripts": {
+    "doctor": "tsx tools/doctor.ts",
+    "reset": "tsx tools/reset.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "sync": "tsx tools/sync-agent-files.ts",
+    "unit": "tsx tools/unit.ts",
+    "propose": "tsx tools/propose.ts",
+    "replay": "tsx tools/replay.ts",
+    "tail": "tsx tools/tail.ts",
+    "seg2": "tsx tools/seg2.ts",
+    "fixtures": "tsx tools/generate-fixtures.ts",
+    "tags": "tsx tools/tags.ts",
+    "verify-tags": "tsx tools/verify-tags.ts",
+    "scan-names": "tsx tools/scan-names.ts",
+    "dry-run": "tsx tools/dry-run.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "zod": "^3.23.8"
+  }
+}

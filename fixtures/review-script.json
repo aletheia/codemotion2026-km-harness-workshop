@@ -1,0 +1,54 @@
+{
+  "note": "Scripted reviewer decisions for `--auto`. These stand in for a human; the log records them as actor human:luca.",
+  "structure": {
+    "note": "tree matches the document: 12 articles, index, note"
+  },
+  "claims": {
+    "cp-2024": [
+      {
+        "action": "verify",
+        "subjectKey": "fire.deductible",
+        "valueText": "500 EUR",
+        "note": "confirmed against Art. 12",
+        "reviewedSpan": {
+          "start": 4240,
+          "end": 4280
+        }
+      },
+      {
+        "action": "verify",
+        "subjectKey": "theft.deductible",
+        "valueText": "250 EUR",
+        "note": "confirmed against Art. 12"
+      },
+      {
+        "action": "add",
+        "subjectKey": "theft.coinsurance",
+        "valueText": "10 %",
+        "note": "extractor read 15 %; the clause says 10 %",
+        "start": 4321,
+        "end": 4360,
+        "quote": "Furto: scoperto del 10 % su ogni danno."
+      },
+      {
+        "action": "add",
+        "subjectKey": "liability.limit",
+        "valueText": "1.000.000 EUR",
+        "note": "missed by the extractor",
+        "start": 4361,
+        "end": 4420,
+        "quote": "Responsabilità civile: massimale di 1.000.000 EUR a evento."
+      }
+    ]
+  },
+  "contested": {
+    "cp-2025": [
+      {
+        "action": "accept-new",
+        "subjectKey": "fire.deductible",
+        "valueText": "750 EUR",
+        "note": "new edition raises the fire deductible"
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+# DECISIONS
+
+Defaults chosen where the brief left a choice open. Change them here first, then in code.
+
+## Defaults
+
+1. **Cold-start batch gate.** Below the probe minimum (10 expected items, `config.gate.probeMinimum`) the gate
+   is "not applicable". Class A is then decided by the comparator alone and class-A audit sampling is 100 %,
+   for Structure and Claims alike.
+2. **Time axes.** `beliefs AT=<date>` and `ask AS_OF=<date>` are **valid-time** queries (the edition in force on
+   that date). **Transaction time** is `SEQ=<n>` (the log up to sequence number n).
+3. **Actor kind `process`** for LogInitialised, DocumentVersionIngested, ACLRejected, CursorAdvanced.
+4. **`eval` coordinates.** Prints absolute span coordinates with the section-local form in brackets.
+5. **Segment 5 checkpoint wording** as in run-sheet change #8: v2 also fails criterion 1; drift lists both.
+
+## Deviations from the run sheet (all deliberate)
+
+- `make X` became `npm run X`, arguments after `--` (`AT=...` → `--at ...`).
+- Event ids are real hashes (`sha256` truncated to 16 hex of producer, input artifact, extractor version,
+  type, aggregate), not `ev-0006`; `occurredAt` comes from a logical clock (2026-10-28T13:00:00Z + seq seconds)
+  so two runs are byte-identical.
+- A claim keeps one `claimId` across extractor versions (hash of document, version, subject, value);
+  re-proposing an existing claim only adds an attribution.
+- `ClaimProposed` carries `quote` and `sectionPath`; a human `ClaimVerified` may carry `reviewedSpans`.
+- The documents are synthetic: 4594 (2024) and 4736 (2025) UTF-16 code units, not the 7480/7612 of the sketch.
+  Spans are UTF-16 offsets, half-open.
+- No system-of-record import: the log starts from `LogInitialised` and the ingested documents.
+- The default `eval` golden cut is the sequence number just before the second edition's
+  `DocumentVersionIngested` event; `--until` overrides it.
+- Batch ids look like `btc-2025-01`.
+- The seg1 retriever is a deterministic hashed n-gram index (computed scores, not a neural embedding).
+- `reset` is deliberately **not** pre-granted in `.claude/settings.json`: the presenter runs it.
+- Tag mapping: `seg1-start` = skeleton commit, `segN-done` = the step commit, `segN+1-start` = `segN-done`,
+  `workshop-v1` = final `main`.
+- Cursor: project permissions file for the **CLI** only (`.cursor/cli.json`); the IDE allowlist file is not
+  verified. Same-name skill de-duplication between `.claude/skills` and `.cursor/skills` is undocumented.

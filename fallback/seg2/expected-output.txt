@@ -1,0 +1,78 @@
+# fallback/seg2/expected-output.txt
+# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
+# It is what the npm commands print when replayed from fixtures/llm in a clean checkout.
+# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
+
+$ npm run seg2 -- log-init --text
+log initialised: seq 1, 2
+[exit 0]
+
+$ npm run seg2 -- ingest --edition 2024 --text
+ingested cp-2024 (2024) length 4594, effective from 2024-01-01 -> seq 3
+[exit 0]
+
+$ npm run seg2 -- extract structure --doc cp-2024 --text
+structure@v1 proposed 14 nodes for cp-2024 -> seq 4
+[exit 0]
+
+$ npm run seg2 -- review --auto --doc cp-2024    # scripted reviewer (fixtures/review-script.json) stands in for the human
+structure of cp-2024 verified -> seq 5
+[stderr]
+Proposed structure of cp-2024: {"treeId":"tree-cp-2024","documentId":"cp-2024","version":"2024","articles":12,"index":1,"notes":1,"verified":false}
+  index  index    [0,449)        Indice
+  art1   article  [449,782)      Oggetto dell'assicurazione
+  art2   article  [782,1115)     Persone assicurate
+  art3   article  [1115,1448)    Dichiarazioni del contraente
+  art4   article  [1448,1781)    Decorrenza e durata
+  art5   article  [1781,2114)    Pagamento del premio
+  art6   article  [2114,2447)    Variazioni del rischio
+  art7   article  [2447,2780)    Beni assicurati
+  art8   article  [2780,3113)    Rischi esclusi
+  art9   article  [3113,3446)    Denuncia del sinistro
+  art10  article  [3446,3779)    Valutazione del danno
+  art11  article  [3779,4120)    Pagamento dell'indennizzo
+  art12  article  [4120,4461)    Franchigie e scoperti
+  note   note     [4461,4594)    Nota informativa
+[exit 0]
+
+$ npm run seg2 -- extract claims --doc cp-2024 --text
+claims@v1 proposed 4 claims for cp-2024:art12
+  6  fire.deductible = 500 EUR
+  7  theft.deductible = 250 EUR
+  8  theft.coinsurance = 15%
+  9  hail.deductible = 300 EUR
+[exit 0]
+
+$ npm run seg2 -- review --auto --doc cp-2024    # scripted reviewer
+verify fire.deductible = 500 EUR  (seq 10)
+verify theft.deductible = 250 EUR  (seq 11)
+add    theft.coinsurance = 10 %  (seq 12,13)
+add    liability.limit = 1.000.000 EUR  (seq 14,15)
+[exit 0]
+
+$ npm run propose -- --file bad-claims.json    # quote not in the source: the write path rejects it
+[stderr]
+error: provenance: quote not found verbatim in source document: "Incendio: franchigia di 999 EUR a evento"
+[exit 2]
+
+$ npm run tail -- --n 20 --text
+  1  LogInitialised           process:log-init
+  2  ExtractorVersionPromoted human:luca                 claims: - -> claims@v1
+  3  DocumentVersionIngested  process:ingest             cp-2024 (2024, from 2024-01-01)
+  4  StructureProposed        agent:structure-extractor  tree-cp-2024: 14 nodes
+  5  StructureVerified        human:luca                 tree-cp-2024
+  6  ClaimProposed            agent:claims-extractor     fire.deductible = 500 EUR [4238,4280)
+  7  ClaimProposed            agent:claims-extractor     theft.deductible = 250 EUR [4281,4320)
+  8  ClaimProposed            agent:claims-extractor     theft.coinsurance = 15% [4321,4360)
+  9  ClaimProposed            agent:claims-extractor     hail.deductible = 300 EUR [4430,4460)
+ 10  ClaimVerified            human:luca                 claim f011ef24
+ 11  ClaimVerified            human:luca                 claim 9294bff5
+ 12  ClaimProposed            human:luca                 theft.coinsurance = 10 % [4321,4360)
+ 13  ClaimVerified            human:luca                 claim 1252c624
+ 14  ClaimProposed            human:luca                 liability.limit = 1.000.000 EUR [4361,4420)
+ 15  ClaimVerified            human:luca                 claim d90d7e37
+[exit 0]
+
+$ npm run replay -- --text
+replayed 15 events: 6 claims {"proposed":2,"verified":4,"contested":0,"superseded":0}; 4 current beliefs; hash 46f0af170231cc78
+[exit 0]

@@ -1,0 +1,16 @@
+{
+  "lineageId": "casa-protetta",
+  "note": "Synthetic general conditions written for the workshop. Not a real policy.",
+  "editions": {
+    "2024": {
+      "documentId": "cp-2024",
+      "file": "casa-protetta-2024.txt",
+      "effectiveFrom": "2024-01-01"
+    },
+    "2025": {
+      "documentId": "cp-2025",
+      "file": "casa-protetta-2025.txt",
+      "effectiveFrom": "2025-01-01"
+    }
+  }
+}

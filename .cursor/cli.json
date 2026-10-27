@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "editor": { "vimMode": false },
+  "permissions": {
+    "allow": [
+      "Shell(npm)",
+      "Read(**)"
+    ],
+    "deny": [
+      "Write(events/**)",
+      "Write(.claude/skills/**)",
+      "Write(.claude/agents/**)",
+      "Write(.cursor/skills/**)",
+      "Write(.cursor/agents/**)"
+    ]
+  }
+}

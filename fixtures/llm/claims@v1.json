@@ -1,0 +1,113 @@
+{
+  "extractor": "claims@v1",
+  "modelId": "fixture-replay",
+  "promptVersion": "claims-p1",
+  "responses": [
+    {
+      "inputHash": "b24b5316a61e2c4b",
+      "note": "2024 art12: 4 claims",
+      "output": {
+        "claims": [
+          {
+            "subjectKey": "fire.deductible",
+            "valueText": "500 EUR",
+            "quote": "Incendio: franchigia di 500 EUR a evento",
+            "span": {
+              "start": 118,
+              "end": 160
+            }
+          },
+          {
+            "subjectKey": "theft.deductible",
+            "valueText": "250 EUR",
+            "quote": "Furto: franchigia di 250 EUR a sinistro",
+            "span": {
+              "start": 161,
+              "end": 200
+            }
+          },
+          {
+            "subjectKey": "theft.coinsurance",
+            "valueText": "15%",
+            "quote": "Furto: scoperto del 10 % su ogni danno.",
+            "span": {
+              "start": 201,
+              "end": 240
+            }
+          },
+          {
+            "subjectKey": "hail.deductible",
+            "valueText": "300 EUR",
+            "quote": "Altri eventi: vedi condizioni.",
+            "span": {
+              "start": 310,
+              "end": 340
+            }
+          }
+        ]
+      }
+    },
+    {
+      "inputHash": "91f1d9499d07c0d8",
+      "note": "2025 art12: 6 claims",
+      "output": {
+        "claims": [
+          {
+            "subjectKey": "fire.deductible",
+            "valueText": "750 EUR",
+            "quote": "Incendio: franchigia di 750 EUR a evento",
+            "span": {
+              "start": 118,
+              "end": 160
+            }
+          },
+          {
+            "subjectKey": "theft.deductible",
+            "valueText": "250 EUR",
+            "quote": "Furto: franchigia di 250 EUR a sinistro",
+            "span": {
+              "start": 161,
+              "end": 200
+            }
+          },
+          {
+            "subjectKey": "theft.coinsurance",
+            "valueText": "10 %",
+            "quote": "Furto: scoperto del 10 % su ogni danno.",
+            "span": {
+              "start": 201,
+              "end": 240
+            }
+          },
+          {
+            "subjectKey": "liability.limit",
+            "valueText": "1.000.000 EUR",
+            "quote": "Responsabilità civile: massimale di 1.000.000 EUR a evento.",
+            "span": {
+              "start": 241,
+              "end": 300
+            }
+          },
+          {
+            "subjectKey": "hail.deductible",
+            "valueText": "300 EUR",
+            "quote": "Grandine: franchigia di 300 EUR a evento",
+            "span": {
+              "start": 301,
+              "end": 341
+            }
+          },
+          {
+            "subjectKey": "weather.coinsurance",
+            "valueText": "5 %",
+            "quote": "Eventi atmosferici: scoperto del 5 % sul sinistro",
+            "span": {
+              "start": 342,
+              "end": 391
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

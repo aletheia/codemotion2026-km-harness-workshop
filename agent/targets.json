@@ -1,0 +1,4 @@
+{
+  "skills": [".claude/skills", ".cursor/skills"],
+  "agents": [".claude/agents", ".cursor/agents"]
+}

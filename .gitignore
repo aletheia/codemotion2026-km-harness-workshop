@@ -1,4 +1,10 @@
 node_modules/
+events/*
+!events/.gitkeep
+state/
+projections/*
+!projections/.gitkeep
+*.log
+.DS_Store
 out/
 dist/
-.DS_Store
