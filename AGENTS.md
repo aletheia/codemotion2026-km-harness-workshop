@@ -32,6 +32,10 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 | `npm run seg1 -- <sub>` | Segment 1 baseline: `query --q <text>`, `delete --edition <year>`, `extract --section art12`, `index`. Index is in `state/`; `reset` removes it. |
 | `npm run seg2 -- <sub>` | Segment 2 pipeline: `log-init`, `ingest`, `extract structure\|claims`, `review`, `show`. |
 | `npm run seg3 -- <sub>` | Segment 3: `ingest`, `extract --layers structure,claims`, `compare`, `review --auto`, `layers-4-6` (pre-computed excerpt). |
+| `npm run seg4 -- <sub>` | Segment 4: `log-cat`, `projections-drop`, `projections-build`, `projections-diff`, `beliefs`, `replay --extractor claims@v2`. |
+| `npm run log-cat [-- --chain <seq\|superseded>]` | The formatted log (seq, type, actor, aggregate, caused by) or one causation chain, root first. |
+| `npm run beliefs [-- --at YYYY-MM-DD \| --seq N]` | CurrentBeliefs. `--at` is VALID time (edition in force on that date); `--seq` is TRANSACTION time (the log up to event N). |
+| `npm run projections-diff` | What the promoted extractor version and a candidate proposed, side by side. |
 | `npm run compare` | The comparator on the newest edition: class A (harness verifies and supersedes, evidence attached), B (stays proposed), C (contested, a human resolves). Prints the batch-gate line. |
 | `npm run unit -- --doc cp-2024 [--section art12]` | Prints the extraction unit you are allowed to see. |
 | `npm run propose -- --file <claims.json>` | Agent write path. Provenance checked inside; whole batch rejected on failure (exit 2). |
@@ -41,7 +45,7 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 | `npm run fixtures` | Regenerates `fixtures/` (a test fails if they differ from the committed ones). |
 | `npm test`, `npm run typecheck` | Test suite and type check. |
 
-More commands appear in later commits (seg4..seg6, beliefs, eval, drift, ask, golden).
+More commands appear in later commits (seg5..seg6, eval, drift, ask, golden).
 
 ## Glossary (defined once)
 

@@ -1,6 +1,11 @@
 // Command bodies shared by the segment dispatchers (tools/segN.ts) and the stand-alone aliases
 // (tools/compare.ts, tools/beliefs.ts, ...). Each one parses its own flags and calls emit().
 import { readFileSync } from 'node:fs';
+import { catRows, causationChain, renderCat, firstSeqOfType } from '../../src/app/query';
+import { projectionsBuild, projectionsDrop } from '../../src/app/projections';
+import { projectionsDiff, renderDiff } from '../../src/app/projectionsDiff';
+import { queryBeliefs, renderBeliefs } from '../../src/app/beliefs';
+import { readAll } from '../../src/adapters/eventLog';
 import { editionByDocumentId } from '../../src/adapters/documents';
 import { repoPath } from '../../src/adapters/paths';
 import { compareDocument, reconfirmStructure } from '../../src/app/compare';
@@ -51,4 +56,39 @@ export function cmdLayers46(args: Args, command: string): void {
   const raw = readFileSync(repoPath('fixtures/precomputed/layers-4-6.jsonl'), 'utf8').trimEnd().split('\n');
   const events = raw.map((l) => JSON.parse(l) as Record<string, unknown>);
   emit(command, { precomputed: true, note: 'hand-written excerpt, not produced by an executed extractor, not in events/', events }, raw.join('\n'), args);
+}
+
+// ---- segment 4 ----
+
+export function cmdLogCat(args: Args, command: string): void {
+  const chain = flag(args, 'chain');
+  if (chain) {
+    const ref = chain === 'superseded' ? String(firstSeqOfType('ClaimSuperseded')) : chain;
+    const rows = causationChain(ref);
+    return emit(command, { chainTo: rows[rows.length - 1]!.seq, events: rows }, `causation chain, root first:\n${renderCat(rows)}`, args);
+  }
+  const rows = catRows(readAll());
+  emit(command, { total: rows.length, events: rows }, renderCat(rows), args);
+}
+
+export function cmdProjectionsDrop(args: Args, command: string): void {
+  const r = projectionsDrop();
+  emit(command, r, `${r.dropped ? 'dropped' : 'no file on disk; nothing to drop:'} ${r.file}; CurrentBeliefs hash before the drop: ${r.hashBeforeDrop} (from the ${r.hashSource})`, args);
+}
+
+export function cmdProjectionsBuild(args: Args, command: string): void {
+  const r = projectionsBuild();
+  const cmp = r.matchesDropped === null ? '' : r.matchesDropped ? `; identical to the hash before the drop (${r.hashBeforeDrop})` : `; DIFFERENT from the hash before the drop (${r.hashBeforeDrop})`;
+  emit(command, r, `rebuilt ${r.file} from ${r.builtFromEvents} events: ${r.currentBeliefs} beliefs, hash ${r.hash}${cmp}`, args);
+}
+
+export function cmdProjectionsDiff(args: Args, command: string): void {
+  const r = projectionsDiff({ from: flag(args, 'from'), to: flag(args, 'to'), doc: flag(args, 'doc') });
+  emit(command, r as unknown as Record<string, unknown>, renderDiff(r), args);
+}
+
+export function cmdBeliefs(args: Args, command: string): void {
+  const seq = flag(args, 'seq');
+  const r = queryBeliefs({ at: flag(args, 'at'), seq: seq === undefined ? undefined : Number(seq) });
+  emit(command, r as unknown as Record<string, unknown>, renderBeliefs(r), args);
 }

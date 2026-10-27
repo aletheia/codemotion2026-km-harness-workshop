@@ -1,0 +1,6 @@
+# DETERMINISTIC TOOL OUTPUT, NOT A MODEL SESSION.
+# It is what the npm command prints when replayed from fixtures/llm in a clean checkout.
+# Regenerate: npm run dry-run -- --write-fallback   (a test fails if this file is out of date)
+$ npm run projections-build -- --text
+
+rebuilt projections/current-beliefs.json from 33 events: 4 beliefs, hash 7ef5238c7afb304f; identical to the hash before the drop (7ef5238c7afb304f)

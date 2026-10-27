@@ -44,3 +44,10 @@ Defaults chosen where the brief left a choice open. Change them here first, then
 - A golden claim item takes the human's reviewed span if there is one, else the claim's first-proposal span.
 - Default `eval` golden cut-off: the sequence number after seg2's last review (seq 15), i.e. before the second
   edition is ingested.
+- `ProposalRec` (the fold) keeps `valueText`, `quote` and `spans` of every `ClaimProposed` event: the claim aggregate
+  keeps only the first proposal's span, but extractor versions share a claim id while their spans differ.
+- `projections-drop` stores the hash it dropped in `state/projection-dropped.json` (from the file if one existed,
+  else computed from the log and labelled so); `projections-build` compares against it. `reset` removes both.
+- `log-cat --chain superseded` follows `causationId` back from the first `ClaimSuperseded` event.
+- `replay --extractor X` replays recorded responses for Article 12 of every ingested document; it needs a verified
+  structure and a recording for each document, otherwise it fails loudly (exit 2).

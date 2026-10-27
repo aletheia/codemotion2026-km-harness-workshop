@@ -13,4 +13,10 @@ A recorded session is the only thing that shows the agent's behaviour. Nothing i
 
 ## What is already here
 
-- Nothing yet: segment 4 is not part of this checkout. See `git tag -l`.
+- `expected-output.txt`: the **deterministic tool output, not a model session**: exactly what the `npm run`
+  commands of segment 4 print when replayed from `fixtures/llm` in a clean checkout. A test fails if it is
+  out of date; regenerate with `npm run dry-run -- --write-fallback`.
+- `log-cat.txt`: deterministic tool output of `npm run log-cat -- --text` at the end of segment 3.
+- `projections-rebuilt.txt`: `projections-build` after `projections-drop`: same hash.
+- `projections-diff.txt`: `projections-diff` after the claims@v2 replay.
+- `beliefs-at-2024-03-01.txt`: `beliefs --at 2024-03-01` (valid time).

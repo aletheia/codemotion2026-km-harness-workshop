@@ -18,7 +18,11 @@ export interface TreeRec {
   proposedEventId: EventId; proposedSeq: number; proposer: Actor;
   verifiedEventId?: EventId; verifiedSeq?: number; verifiedBy?: Actor; verifiedEvidence?: Evidence;
 }
-export interface ProposalRec { eventId: EventId; seq: number; actor: Actor; extractorVersion: string; causationId: EventId | null }
+/** One ClaimProposed event. The claim aggregate keeps only the FIRST proposal's span; every proposal keeps its own here. */
+export interface ProposalRec {
+  eventId: EventId; seq: number; actor: Actor; extractorVersion: string; causationId: EventId | null;
+  valueText: string; quote: string; spans: Claim['spans'];
+}
 export interface DecisionRec { type: ClaimEventType; eventId: EventId; seq: number; actor: Actor; evidence?: Evidence }
 export interface ClaimRec {
   claim: Claim;
@@ -95,13 +99,14 @@ export function applyEvent(f: Fold, e: AnyStoredEvent): void {
     }
     case 'ClaimProposed': {
       const p = e.payload;
+      const spans = p.spans as unknown as Claim['spans'];
       const prop: ProposalRec = {
         eventId: e.eventId, seq: e.seq, actor: e.actor, causationId: e.causationId,
+        valueText: p.valueText, quote: p.quote, spans,
         extractorVersion: e.actor.kind === 'agent' ? e.actor.extractorVersion : 'human',
       };
       const existing = f.claims.get(p.claimId);
       if (existing) { existing.proposals.push(prop); return; } // attribution only: no state change
-      const spans = p.spans as unknown as Claim['spans'];
       const claim: Claim = {
         claimId: asClaimId(p.claimId), lineageId: asLineageId(p.lineageId), subjectKey: p.subjectKey as SubjectKey,
         value: p.value, spans, state: 'proposed',

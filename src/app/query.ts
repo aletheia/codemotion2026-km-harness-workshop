@@ -40,3 +40,41 @@ export function showEvent(ref: string): AnyStoredEvent {
   if (hits.length !== 1) throw new UsageError(hits.length === 0 ? `no event ${ref}` : `event prefix ${ref} is ambiguous`);
   return hits[0]!;
 }
+
+const aggShort = (a: string): string => a.replace(/^(\w+):([0-9a-f]{16})$/, (_m, k: string, id: string) => `${k}:${id.slice(0, 8)}`);
+
+export interface CatRow { seq: number; type: string; actor: string; aggregate: string; causedBy: number | null; causedByType: string | null }
+
+export function catRows(events: readonly AnyStoredEvent[]): CatRow[] {
+  const bySeq = new Map(events.map((e) => [e.eventId, e]));
+  return events.map((e) => {
+    const c = e.causationId ? bySeq.get(e.causationId) : undefined;
+    return { seq: e.seq, type: e.type, actor: `${e.actor.kind}:${e.actor.id}`, aggregate: aggShort(e.aggregateId), causedBy: c?.seq ?? null, causedByType: c?.type ?? null };
+  });
+}
+
+export function renderCat(rows: readonly CatRow[]): string {
+  const head = `${'seq'.padStart(3)} · ${'type'.padEnd(24)} · ${'actor'.padEnd(26)} · ${'aggregate'.padEnd(23)} · caused by`;
+  const lines = rows.map((r) => `${String(r.seq).padStart(3)} · ${r.type.padEnd(24)} · ${r.actor.padEnd(26)} · ${r.aggregate.padEnd(23)} · ${r.causedBy === null ? '-' : `${r.causedBy} ${r.causedByType}`}`);
+  return [head, ...lines].join('\n');
+}
+
+/** The causation chain that ends at `ref`, root first. */
+export function causationChain(ref: string): CatRow[] {
+  const events = readAll();
+  const end = showEvent(ref);
+  const byId = new Map(events.map((e) => [e.eventId, e]));
+  const chain: AnyStoredEvent[] = [];
+  const seen = new Set<string>();
+  for (let cur: AnyStoredEvent | undefined = end; cur && !seen.has(cur.eventId); cur = cur.causationId ? byId.get(cur.causationId) : undefined) {
+    seen.add(cur.eventId);
+    chain.unshift(cur);
+  }
+  return catRows(events).filter((r) => chain.some((c) => c.seq === r.seq));
+}
+
+export function firstSeqOfType(type: string): number {
+  const e = readAll().find((x) => x.type === type);
+  if (!e) throw new UsageError(`no ${type} event in the log`);
+  return e.seq;
+}

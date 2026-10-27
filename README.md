@@ -46,6 +46,9 @@ History on `main` is linear, one commit per step. `npm run tags` creates **annot
 | `npm run seg1 -- <query\|delete\|extract\|index>` | segment 1: the retrieval baseline that loses identity, provenance and time (hashed n-gram TF-IDF scores, not a neural embedding) |
 | `npm run seg2 -- <log-init\|ingest\|extract\|review\|show>` | segment 2: build the log by hand |
 | `npm run seg3 -- <ingest\|extract\|compare\|review\|layers-4-6>` | segment 3: second edition, comparator classes A/B/C |
+| `npm run seg4 -- <log-cat\|projections-drop\|projections-build\|projections-diff\|beliefs\|replay>` | segment 4: the log as source of truth |
+| `npm run log-cat`, `npm run beliefs`, `npm run projections-drop`, `npm run projections-build`, `npm run projections-diff` | the same commands without the `seg4 --` prefix |
+| `npm run replay -- --extractor claims@v2` | replay recorded responses of another extractor version: appends `ClaimProposed` only |
 | `npm run compare` | the comparator on its own (same as `seg3 compare`) |
 | `npm run unit -- --doc cp-2024` | the extraction unit the ACL hands to an extractor |
 | `npm run propose -- --file f.json` | agent write path; provenance enforced inside; exit 2 on rejection |

@@ -4,6 +4,8 @@
 
 export const config = {
   lineageId: 'casa-protetta',
+  /** The one section the workshop extracts claims from (Article 12, deductibles and co-insurance). */
+  sectionPath: 'art12',
   /** IoU threshold for "span provenance correct" (half-open intervals). */
   thetaIoU: 0.8,
   /** Layer precision threshold for promotion criterion 1. */
