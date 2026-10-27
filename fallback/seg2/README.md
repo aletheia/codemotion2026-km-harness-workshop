@@ -16,3 +16,5 @@ A recorded session is the only thing that shows the agent's behaviour. Nothing i
 - `expected-output.txt`: the **deterministic tool output, not a model session**: exactly what the `npm run`
   commands of segment 2 print when replayed from `fixtures/llm` in a clean checkout. A test fails if it is
   out of date; regenerate with `npm run dry-run -- --write-fallback`.
+- `log-after-extract.jsonl`: raw stdout of `npm run tail -- --all --jsonl` after the claims extraction (the file the run sheet names).
+- `log-after-verify.jsonl`: same command after the scripted review.
