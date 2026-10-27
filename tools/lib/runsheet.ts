@@ -27,4 +27,12 @@ export const steps: Step[] = [
   { segment: 2, npm: 'npm run propose -- --file bad-claims.json', tool: 'propose', args: ['--file', '$FILE'], expectExit: 2, note: 'quote not in the source: the write path rejects it', writeFile: { name: 'bad-claims.json', content: bad } },
   { segment: 2, npm: 'npm run tail -- --n 20 --text', tool: 'tail', args: ['--n', '20', '--text'], expectExit: 0 },
   { segment: 2, npm: 'npm run replay -- --text', tool: 'replay', args: ['--text'], expectExit: 0 },
+  { segment: 3, npm: 'npm run seg3 -- ingest --edition 2025 --text', tool: 'seg3', args: ['ingest', '--edition', '2025', '--text'], expectExit: 0 },
+  { segment: 3, npm: 'npm run seg3 -- extract --layers structure,claims --doc cp-2025 --section art12 --text', tool: 'seg3', args: ['extract', '--layers', 'structure,claims', '--doc', 'cp-2025', '--section', 'art12', '--text'], expectExit: 0, note: 'the 2025 tree is reconfirmed by the harness (class A), then six proposals' },
+  { segment: 3, npm: 'npm run tail -- --all --jsonl', tool: 'tail', args: ['--all', '--jsonl'], expectExit: 0, fallback: 'log-after-extract-2025.jsonl' },
+  { segment: 3, npm: 'npm run compare -- --text', tool: 'compare', args: ['--text'], expectExit: 0 },
+  { segment: 3, npm: 'npm run seg3 -- review --auto --text', tool: 'seg3', args: ['review', '--auto', '--text'], expectExit: 0, note: 'scripted reviewer verifies 750 and supersedes 500' },
+  { segment: 3, npm: 'npm run tail -- --all --jsonl', tool: 'tail', args: ['--all', '--jsonl'], expectExit: 0, fallback: 'log-after-compare.jsonl' },
+  { segment: 3, npm: 'npm run seg3 -- layers-4-6 --text', tool: 'seg3', args: ['layers-4-6', '--text'], expectExit: 0, fallback: 'layers-4-6.jsonl', note: 'pre-computed excerpt, never executed live' },
+  { segment: 3, npm: 'npm run replay -- --text', tool: 'replay', args: ['--text'], expectExit: 0 },
 ];

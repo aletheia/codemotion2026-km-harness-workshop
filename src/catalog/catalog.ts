@@ -14,3 +14,4 @@ export const CATALOG: readonly CatalogEntry[] = [
 
 export const lookupSubject = (key: string): CatalogEntry | undefined => CATALOG.find((c) => c.subjectKey === key);
 export const subjectClassOf = (key: string): SubjectClass => lookupSubject(key)?.class ?? 'other';
+export const catalogHas = (key: string): boolean => lookupSubject(key) !== undefined;

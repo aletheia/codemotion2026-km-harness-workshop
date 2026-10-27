@@ -130,8 +130,20 @@ export function buildFixtures(): Record<string, string> {
       ],
     },
     contested: {
-      'cp-2025': [{ action: 'accept-new', subjectKey: 'fire.deductible', valueText: '750 EUR', note: 'new edition raises the fire deductible' }],
+      'cp-2025': [{ action: 'accept-new', subjectKey: 'fire.deductible', valueText: '750 EUR', note: 'new edition raises the fire deductible', reviewedSpan: abs(e25, 'fire.deductible') }],
     },
   });
+
+  // Layers 4-6 excerpt (Entities, Policies, Workflow). Written by hand for the talk: NOT produced by an executed
+  // extractor and NOT part of events/. It shows that the same proposed/verified rule applies upstream layers.
+  const pre = (o: Record<string, unknown>) => `${JSON.stringify({ precomputed: true, ...o })}\n`;
+  const agent = (id: string, v: string) => ({ kind: 'agent', id, extractorVersion: v, modelId: 'fixture-replay' });
+  out['fixtures/precomputed/layers-4-6.jsonl'] = [
+    pre({ n: 1, type: 'EntityProposed', layer: 'entities', actor: agent('entities-extractor', 'entities@v1'), payload: { entityId: 'coverage:fire', name: 'Incendio', claimRefs: ['fire.deductible@cp-2025'] } }),
+    pre({ n: 2, type: 'EntityVerified', layer: 'entities', actor: { kind: 'human', id: 'luca' }, evidence: { kind: 'human', note: 'coverage matches Art. 12' }, causation: 1 }),
+    pre({ n: 3, type: 'PolicyProposed', layer: 'policies', actor: agent('policies-extractor', 'policies@v1'), payload: { policyId: 'policy:monetary-human-rooted', condition: 'quantity is monetary', effect: 'answer only from claims whose verification chain is rooted in a human', claimRefs: ['fire.deductible@cp-2025', 'theft.deductible@cp-2025'] }, causation: 2, comparatorClass: 'B' }),
+    pre({ n: 4, type: 'PolicyVerified', layer: 'policies', actor: { kind: 'human', id: 'luca' }, evidence: { kind: 'human', note: 'policies are never reconfirmed by the harness' }, causation: 3 }),
+    pre({ n: 5, type: 'WorkflowProposed', layer: 'workflow', actor: agent('workflow-extractor', 'workflow@v1'), payload: { workflowId: 'workflow:answer-deductible', steps: ['resolve edition in force on the claim date', 'read the current belief', 'cite belief id and span'] }, causation: 4, comparatorClass: 'B' }),
+  ].join('');
   return out;
 }

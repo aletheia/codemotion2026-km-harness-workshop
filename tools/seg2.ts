@@ -13,7 +13,7 @@ import { logInit } from '../src/app/logInit';
 import { showEvent, summarize } from '../src/app/query';
 import { extractStructure } from '../src/app/structure';
 import { emit, flag, need, parseArgs, run } from './lib/cli';
-import { latestDocumentId, nextStage, reviewClaims, reviewStructure } from './lib/review';
+import { latestDocumentId, nextStage, reviewClaims, reviewContested, reviewStructure } from './lib/review';
 
 const args = parseArgs(process.argv.slice(2), ['text', 'auto']);
 const [cmd, sub] = args._;
@@ -50,11 +50,15 @@ void run(async () => {
         const r = await reviewStructure(doc, auto, stderr);
         return emit('seg2.review.structure', { documentId: doc, event: r.event }, `structure of ${doc} verified -> seq ${r.event.seq}`, args);
       }
+      if (stage === 'contested') {
+        const r = await reviewContested(doc, auto, stderr);
+        return emit('seg2.review.contested', { documentId: doc, decisions: r }, r.map((d) => `${d.action.padEnd(10)} ${d.subjectKey} = ${d.valueText}  (seq ${d.seq.join(',')})`).join('\n'), args);
+      }
       if (stage === 'claims') {
         const r = await reviewClaims(doc, auto, stderr);
         return emit('seg2.review.claims', { documentId: doc, decisions: r }, r.map((d) => `${d.action.padEnd(6)} ${d.subjectKey} = ${d.valueText}  (seq ${d.seq.join(',')})`).join('\n') || '(no decisions)', args);
       }
-      throw new UsageError(`unknown stage "${stage}" (structure | claims)`);
+      throw new UsageError(`unknown stage "${stage}" (structure | claims | contested)`);
     }
     case 'show': {
       const e = showEvent(args._[1] ?? 'last');

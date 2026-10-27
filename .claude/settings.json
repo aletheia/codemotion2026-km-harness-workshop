@@ -5,6 +5,7 @@
       "Bash(npm run seg*)",
       "Bash(npm run unit*)",
       "Bash(npm run propose*)",
+      "Bash(npm run compare*)",
       "Bash(npm run replay*)",
       "Bash(npm run tail*)",
       "Bash(npm test*)",

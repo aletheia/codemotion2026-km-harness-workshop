@@ -27,7 +27,7 @@ function normEq(a: string, b: string): boolean {
   try { return valueEquals(normalize(a), normalize(b)); } catch { return false; }
 }
 
-const lastEventId = (r: ClaimRec): EventId => {
+export const lastEventId = (r: ClaimRec): EventId => {
   const all = [...r.proposals.map((p) => ({ seq: p.seq, id: p.eventId })), ...r.decisions.map((d) => ({ seq: d.seq, id: d.eventId }))];
   return asEventId(all.sort((a, b) => b.seq - a.seq)[0]!.id);
 };
@@ -63,7 +63,7 @@ export function addClaimByHand(a: { documentId: string; subjectKey: string; valu
 }
 
 /** Resolve a contested claim: accept the new value (supersedes the belief) or keep the old one. */
-export function resolveContested(ref: string, decision: 'accept-new' | 'keep-old', note: string) {
+export function resolveContested(ref: string, decision: 'accept-new' | 'keep-old', note: string, reviewedSpan?: { start: number; end: number }) {
   const f = loadFold();
   const rec = findClaim(f, ref);
   if (rec.state !== 'contested') throw new Rejection(`claim ${rec.claim.claimId.slice(0, 8)} is ${rec.state}, not contested`);
@@ -78,7 +78,7 @@ export function resolveContested(ref: string, decision: 'accept-new' | 'keep-old
     const ver = buildEvent({
       type: 'ClaimVerified', aggregateId: `claim:${rec.claim.claimId}`, actor, inputArtifactId: lastEventId(rec),
       causationId: lastEventId(rec), correlationId: `review-contested-${rec.version}`, payload: { claimId: rec.claim.claimId },
-      evidence: { kind: 'human', note },
+      evidence: { kind: 'human', note, ...(reviewedSpan ? { reviewedSpans: [reviewedSpan] } : {}) },
     });
     const sup = buildEvent({
       type: 'ClaimSuperseded', aggregateId: `claim:${belief.claim.claimId}`, actor, inputArtifactId: ver.eventId,

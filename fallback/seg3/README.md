@@ -13,4 +13,9 @@ A recorded session is the only thing that shows the agent's behaviour. Nothing i
 
 ## What is already here
 
-- Nothing yet: segment 3 is not part of this checkout. See `git tag -l`.
+- `expected-output.txt`: the **deterministic tool output, not a model session**: exactly what the `npm run`
+  commands of segment 3 print when replayed from `fixtures/llm` in a clean checkout. A test fails if it is
+  out of date; regenerate with `npm run dry-run -- --write-fallback`.
+- `log-after-extract-2025.jsonl`: raw stdout of `npm run tail -- --all --jsonl` after the 2025 extraction (the file the run sheet names).
+- `log-after-compare.jsonl`: same command after `compare` and the scripted review.
+- `layers-4-6.jsonl`: the hand-written, pre-computed layers 4 to 6 excerpt (every line has `precomputed:true`; never produced by a live run).

@@ -34,3 +34,13 @@ Defaults chosen where the brief left a choice open. Change them here first, then
   `workshop-v1` = final `main`.
 - Cursor: project permissions file for the **CLI** only (`.cursor/cli.json`); the IDE allowlist file is not
   verified. Same-name skill de-duplication between `.claude/skills` and `.cursor/skills` is undocumented.
+- Structure comparator, class A, compares tree **shape** (paths, types and titles in order), not offsets:
+  offsets belong to a document version, so they differ between editions even when nothing changed.
+- The seg1 retriever computes hashed n-gram TF-IDF cosine at query time. This deviates from the brief's
+  "pre-computed vectors": nothing neural is stored, so nothing can be mistaken for a measured embedding result.
+- The batch gate's `rejected` path is pure and unit-tested only. No `BatchRejected` event type exists, so the app
+  never emits one; until the seg5 `eval` module supplies a probe, the app refuses (exit 2) to compare when the
+  golden set holds 10 or more expected items.
+- A golden claim item takes the human's reviewed span if there is one, else the claim's first-proposal span.
+- Default `eval` golden cut-off: the sequence number after seg2's last review (seq 15), i.e. before the second
+  edition is ingested.

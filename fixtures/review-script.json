@@ -47,7 +47,11 @@
         "action": "accept-new",
         "subjectKey": "fire.deductible",
         "valueText": "750 EUR",
-        "note": "new edition raises the fire deductible"
+        "note": "new edition raises the fire deductible",
+        "reviewedSpan": {
+          "start": 4300,
+          "end": 4340
+        }
       }
     ]
   }

@@ -18,6 +18,8 @@
     "tail": "tsx tools/tail.ts",
     "seg1": "tsx tools/seg1.ts",
     "seg2": "tsx tools/seg2.ts",
+    "seg3": "tsx tools/seg3.ts",
+    "compare": "tsx tools/compare.ts",
     "fixtures": "tsx tools/generate-fixtures.ts",
     "tags": "tsx tools/tags.ts",
     "verify-tags": "tsx tools/verify-tags.ts",

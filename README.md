@@ -31,7 +31,7 @@ History on `main` is linear, one commit per step. `npm run tags` creates **annot
 | `seg1-start` | the verified skeleton commit (`step: skeleton`) |
 | `segN-done` | the commit that adds segment N (`step: segN ...`) |
 | `segN+1-start` | the same commit as `segN-done` |
-| `workshop-v1` | the final state of `main` |
+| `workshop-v1` | the final state of `main`, created only once `step: seg6` exists |
 
 `npm run verify-tags` clones the repo once per tag into a temp directory, checks the tag out, and runs
 `npm ci`, `npm run doctor`, `npm run typecheck`, `npm test`. The same script runs in CI
@@ -45,6 +45,8 @@ History on `main` is linear, one commit per step. `npm run tags` creates **annot
 | `npm run reset` | clean demo state (empties `events/`, `projections/`); not pre-granted to the agent |
 | `npm run seg1 -- <query\|delete\|extract\|index>` | segment 1: the retrieval baseline that loses identity, provenance and time (hashed n-gram TF-IDF scores, not a neural embedding) |
 | `npm run seg2 -- <log-init\|ingest\|extract\|review\|show>` | segment 2: build the log by hand |
+| `npm run seg3 -- <ingest\|extract\|compare\|review\|layers-4-6>` | segment 3: second edition, comparator classes A/B/C |
+| `npm run compare` | the comparator on its own (same as `seg3 compare`) |
 | `npm run unit -- --doc cp-2024` | the extraction unit the ACL hands to an extractor |
 | `npm run propose -- --file f.json` | agent write path; provenance enforced inside; exit 2 on rejection |
 | `npm run replay` | re-fold the log from scratch; prints a hash of CurrentBeliefs |

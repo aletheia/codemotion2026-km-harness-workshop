@@ -31,6 +31,8 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 | `npm run reset` | Returns the demo to a clean state (empties `events/` and `projections/`). Not pre-granted. |
 | `npm run seg1 -- <sub>` | Segment 1 baseline: `query --q <text>`, `delete --edition <year>`, `extract --section art12`, `index`. Index is in `state/`; `reset` removes it. |
 | `npm run seg2 -- <sub>` | Segment 2 pipeline: `log-init`, `ingest`, `extract structure\|claims`, `review`, `show`. |
+| `npm run seg3 -- <sub>` | Segment 3: `ingest`, `extract --layers structure,claims`, `compare`, `review --auto`, `layers-4-6` (pre-computed excerpt). |
+| `npm run compare` | The comparator on the newest edition: class A (harness verifies and supersedes, evidence attached), B (stays proposed), C (contested, a human resolves). Prints the batch-gate line. |
 | `npm run unit -- --doc cp-2024 [--section art12]` | Prints the extraction unit you are allowed to see. |
 | `npm run propose -- --file <claims.json>` | Agent write path. Provenance checked inside; whole batch rejected on failure (exit 2). |
 | `npm run replay` | Re-folds the log from scratch; prints counts and the CurrentBeliefs hash. |
@@ -39,7 +41,7 @@ synthetic. No model is called by the tools: LLM output comes from recorded fixtu
 | `npm run fixtures` | Regenerates `fixtures/` (a test fails if they differ from the committed ones). |
 | `npm test`, `npm run typecheck` | Test suite and type check. |
 
-More commands appear in later commits (seg3..seg6, compare, beliefs, eval, drift, ask, golden).
+More commands appear in later commits (seg4..seg6, beliefs, eval, drift, ask, golden).
 
 ## Glossary (defined once)
 
