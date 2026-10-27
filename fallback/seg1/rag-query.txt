@@ -1,6 +1,6 @@
-rag-query  index=cc-art2477  chunks=37  top_k=3  q="soglia ricavi nomina organo di controllo"
+rag-query  index=cc-art2477  chunks=23  top_k=3  q="soglia dei ricavi per la nomina obbligatoria dell'organo di controllo"
 score  chunk                      text (trimmed)
-0.871  cc-art2477-v8 #7           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo … 2 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 2 milioni di euro; …
-0.868  cc-art2477-v9 #7           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo … 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; …
-0.842  cc-art2477-v7 #6           … c) per due esercizi consecutivi ha superato due dei limiti indicati dal primo comma dell'articolo 2435-bis.
+0.244  cc-art2477-v8 #3           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 2 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 2 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 10 unità.
+0.242  cc-art2477-v9 #3           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 20 unità.
+0.205  cc-art2477-v7 #3           … c) per due esercizi consecutivi ha superato due dei limiti indicati dal primo comma dell'articolo 2435-bis.
 fields available per chunk: id, source_file, text, vector

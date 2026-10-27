@@ -1,5 +1,5 @@
 // npm run viewer [-- --port <n>] [-- --file <events.jsonl>] [-- --export <file.html>] [-- --env <file>] — a browser
-// view of the log; the Chunks tab arrives with ws-seg1, Claims and Dependencies with ws-seg2. --export writes one
+// view of the log and the RAG chunks; the Claims and Dependencies tabs arrive with ws-seg2. --export writes one
 // self-contained HTML snapshot of the log (opens with a double click, offline, no server) and exits. With
 // ANTHROPIC_API_KEY set (environment, or a .env file: --env, the current directory, or the checkout that holds the
 // log), the Explain panel asks Claude Haiku to tell the story of a log row; without it nothing leaves the machine.
@@ -12,6 +12,7 @@ import { dirname, join, resolve } from 'node:path';
 import { config } from '../config';
 import { readLog } from '../events/log';
 import { isDecision, type LogEvent } from '../events/schema';
+import { chunkParagraphs } from '../rag-baseline/chunk';
 import { argValue, hasFlag, run } from './cli';
 import { displayActor, displayEventId, displayLabel, evidenceSummary, formatLog } from './tail-format';
 
@@ -36,14 +37,38 @@ function logView(events: readonly LogEvent[]) {
   }));
 }
 
+/** Paragraph chunks of the RAG baseline, with absolute offsets so the page can show which claims fall inside each. */
+function chunksView(ragIndex: string) {
+  const indexed = existsSync(ragIndex)
+    ? new Set((JSON.parse(readFileSync(ragIndex, 'utf8')) as { chunks: { id: string }[] }).chunks.map((c) => c.id))
+    : null;
+  return config.rag.sourceFiles.flatMap((file) => {
+    const text = readFileSync(join(config.rag.sourceDir, file), 'utf8');
+    let cursor = 0;
+    return chunkParagraphs(file, text).map((c) => {
+      const start = text.indexOf(c.text, cursor);
+      cursor = start + c.text.length;
+      return { ...c, version: file.match(/-(v\d+)\.txt$/)?.[1] ?? '?', start, end: cursor, inIndex: indexed ? indexed.has(c.id) : null };
+    });
+  });
+}
+
+/** The RAG index sits next to the log (out/rag/index.json beside out/events.jsonl), so --file follows another checkout. */
+const ragIndexBeside = (logPath: string): string => join(dirname(logPath), 'rag', 'index.json');
+
+/** The source texts by version label, for the document panel. */
+const documents = (): Record<string, string> =>
+  Object.fromEntries(config.rag.sourceFiles.map((f) => [f.match(/-(v\d+)\.txt$/)![1]!, readFileSync(join(config.rag.sourceDir, f), 'utf8')]));
+
 /** Tabs this checkout has not built yet, each with the tag that adds it: the page names the tag instead of breaking. */
-const FEATURES: Readonly<Record<string, string>> = { chunks: 'ws-seg1', claims: 'ws-seg2', graph: 'ws-seg2' };
+const FEATURES: Readonly<Record<string, string>> = { claims: 'ws-seg2', graph: 'ws-seg2' };
 
 function state(path: string) {
   const events = readLog(path);
+  const ragIndex = ragIndexBeside(path);
   return {
     log: logView(events), claims: [], graph: { nodes: [], edges: [] }, warnings: [], at: events.length, total: events.length,
-    chunks: [], ragIndexed: false, documents: {}, writable: false,
+    chunks: chunksView(ragIndex), ragIndexed: existsSync(ragIndex), documents: documents(), writable: false,
     explain: { enabled: Boolean(API_KEY), model: EXPLAIN_MODEL, known: Object.fromEntries(explanations) },
     features: FEATURES,
   };

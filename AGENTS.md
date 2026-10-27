@@ -203,7 +203,7 @@ Build in this order. Each phase ends with one commit on `main`; the human then c
 | Order | Phase | Scope | Acceptance | Tag |
 | --- | --- | --- | --- | --- |
 | 1 | A | scaffold, config, domain, events, log, append, transition, `log:init`, `log:reset`, `tail`, `log:cat`, unit tests | `npm test` green; `log:init` + `log:cat` = first two lines of `fallback/seg2/log-after-extract.txt` | (`ws_step1_end`) |
-| 2 | F1 | rag-baseline, `rag:index`, `rag:query`, `rag:delete-v8`, `rag:extract-c2`, fixture `oneshot@v1` | `rag:query` top 3 = the lettera c) passages of v7, v8, v9; `fallback/seg1/` rewritten with the real outputs | `ws-seg1` |
+| 2 | F1 | rag-baseline, `rag:index`, `rag:query`, `rag:delete-v8`, `rag:extract-c2`, fixture `oneshot@v1` | `rag:query` (one chunk per paragraph, the segment-6 question) top 3 = the comma-3 paragraphs (lettera c)) of v7, v8, v9 in any order; `fallback/seg1/` rewritten with the real outputs | `ws-seg1` |
 | 3 | B | catalog, normalizer, labels, replayer, fixtures for v8, ACL, structure/claims extractors, reviewer CLI, segment 2 scripts, `show` | `log:cat` after segment 2 = `fallback/seg2/log-after-verify.txt` (15 events); `show:ricavi-v8` = its fallback | `ws-seg2` |
 | 4 | C | beliefs, comparator, gate, sampling, prior importer, fixtures for v9, segment 3 scripts, `layers-4-6` | `log:cat` = `fallback/seg3/log-after-compare.txt` (35 events); `compare` = its fallback | `ws-seg3` |
 | 5 | D | projections, drop/build, replay, diff, beliefs `--at` / `--seq`, fixtures for claims@v2 | seg4 fallbacks; 46 events after replay | `ws-seg4` |

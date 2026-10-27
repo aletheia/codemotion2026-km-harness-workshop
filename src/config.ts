@@ -6,6 +6,18 @@ export const config = {
     outDir: 'out',
     log: 'out/events.jsonl',
     projections: 'out/projections',
+    ragIndex: 'out/rag/index.json',
+    llmFixtures: 'fixtures/llm',
+  },
+
+  // Segment 1 retrieval baseline: one chunk per paragraph, TF-IDF cosine, top 3; the query is the segment-6 question.
+  rag: {
+    indexName: 'cc-art2477',
+    sourceDir: 'fixtures/documents',
+    sourceFiles: ['cc-art2477-v7.txt', 'cc-art2477-v8.txt', 'cc-art2477-v9.txt'],
+    topK: 3,
+    query: "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo",
+    extractUnit: { file: 'cc-art2477-v8.txt', documentId: 'cc-art2477', version: 'v8', path: 'c2' },
   },
 
   log: {

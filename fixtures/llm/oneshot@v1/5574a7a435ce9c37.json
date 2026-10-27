@@ -1,0 +1,17 @@
+{
+  "extractor": "oneshot",
+  "version": "v1",
+  "modelId": "claude-<version>",
+  "promptVersion": "oneshot-p1",
+  "inputHash": "5574a7a435ce9c37",
+  "request": {
+    "prompt": "Estrai in JSON le soglie, gli esercizi consecutivi e la regola di questo comma.",
+    "unit": {
+      "documentId": "cc-art2477",
+      "version": "v8",
+      "path": "c2",
+      "text": "La nomina dell'organo di controllo o del revisore è obbligatoria se la società:\na) è tenuta alla redazione del bilancio consolidato;\nb) controlla una società obbligata alla revisione legale dei conti;\nc) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 2 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 2 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 10 unità."
+    }
+  },
+  "response": "{\n  \"soglie\": { \"attivo\": 2000000, \"ricavi\": 2000000, \"dipendenti\": 10 },\n  \"esercizi_consecutivi\": 3,\n  \"regola\": \"due dei tre limiti\"\n}\n"
+}

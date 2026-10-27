@@ -46,7 +46,7 @@ The LLM fixtures for `claims@v1` and `claims@v2` must produce exactly the propos
 
 ## Retrieval baseline
 
-`npm run rag:index` chunks the three files (illustrative: ~160-character windows, no overlap) and must return the three lett. c) passages with comparable scores for the query "soglia ricavi nomina organo di controllo".
+`npm run rag:index` chunks the three files (one chunk per paragraph, split on blank lines; TF-IDF with sublinear tf and an Italian stopword list, cosine) and must return the three lett. c) passages with comparable scores for the query "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo".
 
 ## Regeneration
 

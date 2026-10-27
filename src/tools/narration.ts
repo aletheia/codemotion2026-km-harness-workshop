@@ -6,6 +6,10 @@ export const scriptNarration: Readonly<Record<string, string>> = {
   'log:cat': 'prints the whole log through the tail formatter: the log is the only state',
   'viewer': 'serves a read-only browser view of the log on localhost: it re-reads the log on every request',
   'tail': 'follows out/events.jsonl and prints every appended event (★ = decision event, with its evidence)',
+  'rag:index': 'chunks v7, v8, v9 of art. 2477 one paragraph per chunk and embeds them in a local vector index',
+  'rag:query': 'asks the index the segment-6 question: the top chunks by similarity, with no version or validity date',
+  'rag:delete-v8': 'deletes the v8 chunks from the index: what the index "knew" disappears with the document',
+  'rag:extract-c2': 'one-shot extraction of comma 2 of v8 from the retrieved chunk: a JSON blob, no span, no version, no date',
 };
 
 export function narrate(script: string | undefined): void {

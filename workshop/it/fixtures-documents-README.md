@@ -48,7 +48,7 @@ Le fixture LLM per `claims@v1` e `claims@v2` devono produrre esattamente le prop
 
 ## Baseline di retrieval
 
-`npm run rag:index` suddivide in chunk i tre file (illustrativo: finestre di ~160 caratteri, senza sovrapposizione) e deve restituire i tre passaggi della lett. c) con punteggi comparabili per la query "soglia ricavi nomina organo di controllo".
+`npm run rag:index` suddivide in chunk i tre file (un chunk per paragrafo, separato da riga vuota; TF-IDF con tf sublineare e stopword italiane, coseno) e deve restituire i tre passaggi della lett. c) con punteggi comparabili per la query "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo".
 
 ## Rigenerazione
 

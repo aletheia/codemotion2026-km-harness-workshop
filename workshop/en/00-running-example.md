@@ -116,7 +116,7 @@ Structure in segment 3: `StructureVerified(actor=harness)` class A — same path
 | "Quanti esercizi consecutivi?" | now | 2 | v9 `esercizi.consecutivi`, harness class-A reconfirmation rooted in the v8 human verification |
 | "Entro quanti giorni deve provvedere l'assemblea?" | now | not answerable under the monetary/time-limit policy: the belief is proposed (class B) | `assemblea.termine`, proposed |
 
-Segment 1 baseline question: "L'assemblea del 30 aprile 2019 approva il bilancio 2018. Quale soglia di ricavi si applica, e su quale evidenza presente nel chunk?" — the index holds v7, v8 and v9; the query "soglia ricavi nomina organo di controllo" returns three passages with comparable scores ("due dei limiti … 2435-bis", "2 milioni di euro", "4 milioni di euro"); no field says which was in force.
+Segment 1 baseline question: "L'assemblea del 30 aprile 2019 approva il bilancio 2018. Quale soglia di ricavi si applica, e su quale evidenza presente nel chunk?" — the index holds v7, v8 and v9; the query "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo" returns three passages with comparable scores ("due dei limiti … 2435-bis", "2 milioni di euro", "4 milioni di euro"); no field says which was in force.
 
 Transaction-time queries (`--seq <n>`) exist but show nothing on stage: every event is appended on 28 Oct 2026.
 
@@ -156,7 +156,7 @@ Import from a system of record: `fixtures/documents/compliance-register.csv`, th
 | v2 regression | `ricavi.limite` 2,000 EUR |
 | IoU spoken aloud | 62/64 = 0.97 |
 | Temporal query | "assemblea del 30 aprile 2019, bilancio 2018" / `--at 2019-04-30` |
-| Retrieval query | "soglia ricavi nomina organo di controllo" |
+| Retrieval query | "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo" |
 | Prior (illustrative, not live) | `compliance-register.csv` |
 | npm scripts | `rag:index`, `rag:query`, `rag:delete-v8`, `rag:extract-c2`, `log:init`, `log:reset`, `ingest:v8`, `ingest:v9`, `extract:structure-v8`, `extract:claims-v8`, `extract:v9`, `show:ricavi-v8`, `review`, `review:auto`, `compare`, `layers-4-6`, `log:cat`, `projections:drop`, `projections:build`, `replay:claims-v2`, `projections:diff`, `beliefs:at-2019-04-30`, `beliefs`, `golden:claims-until-seg2`, `golden:claims`, `eval:claims-v1`, `eval:claims-v2-summary`, `drift:v1-v2`, `ask:ricavi-2019-04-30`, `ask:ricavi`, `dry-run`, `tail`, `test` |
 | Fallback files | `fallback/seg1/rag-query.txt`, `rag-after-delete.txt`, `rag-extract.txt`; `seg2/log-after-extract.txt`, `log-after-verify.txt`; `seg3/log-after-extract-v9.txt`, `log-after-compare.txt`, `layers-4-6.txt`; `seg4/log-cat.txt`, `projections-rebuilt.txt`, `projections-diff.txt`, `beliefs-at-2019-04-30.txt`; `seg5/golden-claims.txt`, `eval-v1.txt`, `eval-v2-summary.txt`, `drift-v1-v2.txt`; `seg6/ask.txt` |

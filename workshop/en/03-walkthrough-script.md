@@ -30,11 +30,11 @@ Tail line format (from `npm run tail`): `seq · type · actor.kind(actor.id) · 
 Expected output (Terminal A):
 
 ```
-rag-query  index=cc-art2477  chunks=37  top_k=3  q="soglia ricavi nomina organo di controllo"
+rag-query  index=cc-art2477  chunks=23  top_k=3  q="soglia dei ricavi per la nomina obbligatoria dell'organo di controllo"
 score  chunk                      text (trimmed)
-0.871  cc-art2477-v8 #7           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo … 2 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 2 milioni di euro; …
-0.868  cc-art2477-v9 #7           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo … 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; …
-0.842  cc-art2477-v7 #6           … c) per due esercizi consecutivi ha superato due dei limiti indicati dal primo comma dell'articolo 2435-bis.
+0.244  cc-art2477-v8 #3           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 2 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 2 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 10 unità.
+0.242  cc-art2477-v9 #3           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 20 unità.
+0.205  cc-art2477-v7 #3           … c) per due esercizi consecutivi ha superato due dei limiti indicati dal primo comma dell'articolo 2435-bis.
 fields available per chunk: id, source_file, text, vector
 ```
 
@@ -47,11 +47,12 @@ Correct reasoning: no evidence is present. The chunk carries text and a vector; 
 ### 15:27 — `npm run rag:delete-v8` then `npm run rag:query` (slide 4)
 
 ```
-rag-delete  version=v8  removed=13 chunks  index=cc-art2477 (24 chunks left)
-rag-query  index=cc-art2477  chunks=24  top_k=3  q="soglia ricavi nomina organo di controllo"
+rag-delete  version=v8  removed=8 chunks  index=cc-art2477 (15 chunks left)
+rag-query  index=cc-art2477  chunks=15  top_k=3  q="soglia dei ricavi per la nomina obbligatoria dell'organo di controllo"
 score  chunk                      text (trimmed)
-0.868  cc-art2477-v9 #7           … ricavi delle vendite e delle prestazioni: 4 milioni di euro; …
-0.842  cc-art2477-v7 #6           … due dei limiti indicati dal primo comma dell'articolo 2435-bis.
+0.244  cc-art2477-v9 #3           … c) ha superato per due esercizi consecutivi almeno uno dei seguenti limiti: 1) totale dell'attivo dello stato patrimoniale: 4 milioni di euro; 2) ricavi delle vendite e delle prestazioni: 4 milioni di euro; 3) dipendenti occupati in media durante l'esercizio: 20 unità.
+0.208  cc-art2477-v7 #3           … c) per due esercizi consecutivi ha superato due dei limiti indicati dal primo comma dell'articolo 2435-bis.
+0.141  cc-art2477-v7 #5           Nel caso di nomina di un organo di controllo, anche monocratico, si applicano le disposizioni sul collegio sindacale previste per le società per azion …
 ```
 
 Say as a statement: "The only operation the index offers to retire the March text is deletion. The question about 30 April 2019 no longer has an answer: the text that was in force on that date is gone, and the two that remain are wrong for it. The index has no state for 'no longer current but true for its period', because it has neither assertions nor time."

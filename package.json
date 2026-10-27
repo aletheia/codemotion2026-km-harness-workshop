@@ -8,10 +8,10 @@
     "node": ">=20"
   },
   "scripts": {
-    "rag:index": "tsx src/tools/not-implemented.ts rag:index F1",
-    "rag:query": "tsx src/tools/not-implemented.ts rag:query F1",
-    "rag:delete-v8": "tsx src/tools/not-implemented.ts rag:delete-v8 F1",
-    "rag:extract-c2": "tsx src/tools/not-implemented.ts rag:extract-c2 F1",
+    "rag:index": "tsx src/tools/rag-index.ts",
+    "rag:query": "tsx src/tools/rag-query.ts",
+    "rag:delete-v8": "tsx src/tools/rag-delete.ts --version v8",
+    "rag:extract-c2": "tsx src/tools/rag-extract.ts",
     "log:reset": "tsx src/tools/log-reset.ts",
     "log:init": "tsx src/tools/log-init.ts",
     "ingest:v8": "tsx src/tools/not-implemented.ts ingest:v8 B",
