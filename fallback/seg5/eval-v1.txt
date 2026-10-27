@@ -1,0 +1,9 @@
+eval  extractor=claims@v1  golden=claims@g1 (until seq 15, 4 expected)  theta_iou=0.80 (illustrative)   spans: absolute [c2-local]
+expected                                      proposal (v1)                                  IoU    outcome          counts
+attivo.limite 2,000,000 [1000,1062) [280,342)  attivo.limite 2,000,000 [998,1062) [278,342)  0.97   correct          TP
+ricavi.limite 2,000,000 [1067,1126) [347,406)  ricavi.limite 2,000,000 [1067,1126) [347,406) 1.00   correct          TP
+esercizi.consecutivi 2 [936,964) [216,244)     esercizi.consecutivi 3 [936,964) [216,244)    1.00   wrong value      FP + FN
+dipendenti.limite 10 [1131,1189) [411,469)     —                                             —      missing          FN
+—                                             capitale.soglia "minimo s.p.a." [720,799)     —      unexpected       FP
+TP 2  FP 2  FN 2   precision 0.50   recall 0.50
+→ EvalCompleted ev-0047

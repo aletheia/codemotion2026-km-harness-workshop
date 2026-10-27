@@ -1,0 +1,9 @@
+0001 · LogInitialised            · process(log-init)   · source    · log           ·
+0002 ★ ExtractorVersionPromoted  · human(luca)         · harness   · claims@v1     ·            evidence: initial version, no predecessor
+0003 · DocumentVersionIngested   · process(ingest)     · source    · cc-art2477@v8 ·
+0004 · StructureProposed         · agent(structure@v1) · structure · tree-v8       · ← ev-0003
+0005 ★ StructureVerified         · human(luca)         · structure · tree-v8       · ← ev-0004  evidence: 8/8 nodes, intervals cover 0..1990
+0006 · ClaimProposed             · agent(claims@v1)    · claims    · clm-attivo2m  · ← ev-0005
+0007 · ClaimProposed             · agent(claims@v1)    · claims    · clm-ricavi2m  · ← ev-0005
+0008 · ClaimProposed             · agent(claims@v1)    · claims    · clm-eserc3    · ← ev-0005
+0009 · ClaimProposed             · agent(claims@v1)    · claims    · clm-capitale  · ← ev-0005

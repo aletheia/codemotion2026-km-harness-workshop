@@ -1,0 +1,8 @@
+replay  extractor=claims@v2 (candidate)  inputs: StructureVerified ev-0005 (v8: c2), ev-0018 (v9: c2, c3, c5)  (fixture replay)
+proposals: 5 (v8/c2) + 6 (v9) = 11 appended, 0 duplicates
+0036 · ClaimProposed             · agent(claims@v2)    · claims    · clm-v2-attivo2m · ← ev-0005
+0037 · ClaimProposed             · agent(claims@v2)    · claims    · clm-v2-ricavi2k · ← ev-0005
+0038 · ClaimProposed             · agent(claims@v2)    · claims    · clm-v2-eserc2   · ← ev-0005
+0039 · ClaimProposed             · agent(claims@v2)    · claims    · clm-v2-dip10    · ← ev-0005
+0040 · ClaimProposed             · agent(claims@v2)    · claims    · clm-v2-cess3a   · ← ev-0005
+0041–0046 · ClaimProposed        · agent(claims@v2)    · claims    · (v9: c2, c3, c5 — six proposals)

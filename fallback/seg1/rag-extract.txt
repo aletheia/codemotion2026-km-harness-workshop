@@ -1,0 +1,6 @@
+rag-extract  unit=v8/c2  extractor=one-shot  model=claude-<version> (illustrative)
+{
+  "soglie": { "attivo": 2000000, "ricavi": 2000000, "dipendenti": 10 },
+  "esercizi_consecutivi": 3,
+  "regola": "due dei tre limiti"
+}

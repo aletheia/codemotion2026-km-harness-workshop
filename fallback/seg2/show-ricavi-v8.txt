@@ -1,0 +1,20 @@
+{
+  "eventId": "ev-0007",
+  "seq": 7,
+  "aggregateVersion": 1,
+  "type": "ClaimProposed",
+  "layer": "claims",
+  "aggregateId": "clm-ricavi2m",
+  "actor": { "kind": "agent", "id": "claims-extractor",
+             "modelId": "claude-<version> (illustrative; the fixture records the real id)", "promptVersion": "p3", "extractorVersion": "claims@v1" },
+  "causationId": "ev-0005",
+  "correlationId": "run-v8-c2-01",
+  "occurredAt": "2026-10-28T13:37:12Z",
+  "payload": {
+    "lineageId": "cc-art2477",
+    "subjectKey": "ricavi.limite",
+    "normalizedValue": { "type": "money", "amount": 2000000, "currency": "EUR" },
+    "spans": [ { "documentId": "cc-art2477", "version": "v8", "start": 1067, "end": 1126 } ],
+    "sectionPath": "c2"
+  }
+}

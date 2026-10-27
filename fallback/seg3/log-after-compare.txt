@@ -1,0 +1,35 @@
+0001 · LogInitialised            · process(log-init)   · source    · log           ·
+0002 ★ ExtractorVersionPromoted  · human(luca)         · harness   · claims@v1     ·            evidence: initial version, no predecessor
+0003 · DocumentVersionIngested   · process(ingest)     · source    · cc-art2477@v8 ·
+0004 · StructureProposed         · agent(structure@v1) · structure · tree-v8       · ← ev-0003
+0005 ★ StructureVerified         · human(luca)         · structure · tree-v8       · ← ev-0004  evidence: 8/8 nodes, intervals cover 0..1990
+0006 · ClaimProposed             · agent(claims@v1)    · claims    · clm-attivo2m  · ← ev-0005
+0007 · ClaimProposed             · agent(claims@v1)    · claims    · clm-ricavi2m  · ← ev-0005
+0008 · ClaimProposed             · agent(claims@v1)    · claims    · clm-eserc3    · ← ev-0005
+0009 · ClaimProposed             · agent(claims@v1)    · claims    · clm-capitale  · ← ev-0005
+0010 ★ ClaimVerified             · human(luca)         · claims    · clm-attivo2m  · ← ev-0006  evidence: note "ok"; span [998,1062)
+0011 ★ ClaimVerified             · human(luca)         · claims    · clm-ricavi2m  · ← ev-0007  evidence: note "ok"; span [1067,1126)
+0012 · ClaimProposed             · human(luca)         · claims    · clm-eserc2    · ← ev-0005
+0013 ★ ClaimVerified             · human(luca)         · claims    · clm-eserc2    · ← ev-0012  evidence: note "added by reviewer"
+0014 · ClaimProposed             · human(luca)         · claims    · clm-dip10     · ← ev-0005
+0015 ★ ClaimVerified             · human(luca)         · claims    · clm-dip10     · ← ev-0014  evidence: note "missing in v1 output"
+0016 · DocumentVersionIngested   · process(ingest)     · source    · cc-art2477@v9 ·
+0017 · StructureProposed         · agent(structure@v1) · structure · tree-v9       · ← ev-0016
+0018 ★ StructureVerified         · harness(compare)    · structure · tree-v9       · ← ev-0017  evidence: class A, same paths/types as tree-v8 (ev-0005)
+0019 · ClaimProposed             · agent(claims@v1)    · claims    · clm-eserc2b   · ← ev-0018
+0020 · ClaimProposed             · agent(claims@v1)    · claims    · clm-attivo4m  · ← ev-0018
+0021 · ClaimProposed             · agent(claims@v1)    · claims    · clm-ricavi4m  · ← ev-0018
+0022 · ClaimProposed             · agent(claims@v1)    · claims    · clm-dip20     · ← ev-0018
+0023 · ClaimProposed             · agent(claims@v1)    · claims    · clm-cess3     · ← ev-0018
+0024 · ClaimProposed             · agent(claims@v1)    · claims    · clm-term30    · ← ev-0018
+0025 ★ ClaimVerified             · harness(compare)    · claims    · clm-eserc2b   · ← ev-0019  evidence: A: belief clm-eserc2 (ev-0013) · btc-v9-01
+0026 ★ ClaimSuperseded           · harness(compare)    · claims    · clm-eserc2    · ← ev-0025  evidence: reconfirmation-chain → clm-eserc2b
+0027 ★ ClaimContested            · harness(compare)    · claims    · clm-attivo4m  · ← ev-0020  evidence: C: conflicts clm-attivo2m (2,000,000 ≠ 4,000,000)
+0028 ★ ClaimContested            · harness(compare)    · claims    · clm-ricavi4m  · ← ev-0021  evidence: C: conflicts clm-ricavi2m (2,000,000 ≠ 4,000,000)
+0029 ★ ClaimContested            · harness(compare)    · claims    · clm-dip20     · ← ev-0022  evidence: C: conflicts clm-dip10 (10 ≠ 20)
+0030 ★ ClaimVerified             · human(luca)         · claims    · clm-attivo4m  · ← ev-0027  evidence: note "L. 55/2019 in force from 2019-06-18"
+0031 ★ ClaimSuperseded           · human(luca)         · claims    · clm-attivo2m  · ← ev-0030  evidence: successor clm-attivo4m; valid until 2019-06-18
+0032 ★ ClaimVerified             · human(luca)         · claims    · clm-ricavi4m  · ← ev-0028  evidence: note "L. 55/2019 in force from 2019-06-18"
+0033 ★ ClaimSuperseded           · human(luca)         · claims    · clm-ricavi2m  · ← ev-0032  evidence: successor clm-ricavi4m; valid until 2019-06-18
+0034 ★ ClaimVerified             · human(luca)         · claims    · clm-dip20     · ← ev-0029  evidence: note "L. 55/2019 in force from 2019-06-18"
+0035 ★ ClaimSuperseded           · human(luca)         · claims    · clm-dip10     · ← ev-0034  evidence: successor clm-dip20; valid until 2019-06-18

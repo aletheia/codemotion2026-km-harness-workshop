@@ -1,0 +1,8 @@
+projections-drop   removed: CurrentBeliefs, ClaimsByDocumentVersion, ConflictQueue, ReviewQueue, Timeline
+projections-build  folded 35 events in 12 ms
+CurrentBeliefs (cc-art2477)                                      hash 5e17c0
+  attivo.limite          4,000,000 EUR  clm-attivo4m  human(luca)      ev-0030   root: human
+  ricavi.limite          4,000,000 EUR  clm-ricavi4m  human(luca)      ev-0032   root: human
+  dipendenti.limite      20             clm-dip20     human(luca)      ev-0034   root: human
+  esercizi.consecutivi   2              clm-eserc2b   harness(compare) ev-0025   root: human (clm-eserc2, ev-0013)
+ConflictQueue  0 open      ReviewQueue  4 proposed (clm-eserc3, clm-capitale [UNEXPECTED], clm-cess3, clm-term30)

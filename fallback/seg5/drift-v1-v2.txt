@@ -1,0 +1,10 @@
+drift  from=claims@v1  to=claims@v2  golden=claims@g1  per item
+expected                    v1            v2            cell
+attivo.limite               correct       correct       stable
+ricavi.limite               correct       wrong value   REGRESSION   (v2: 2,000 EUR — "milioni" dropped; class monetary → critical subset)
+esercizi.consecutivi        wrong value   correct       improvement
+dipendenti.limite           missing       correct       improvement
+noise introduced by v2: cessazione.esercizi 3 (true in the article, not in unit c2, no expected item)
+provenance drift: none
+promotion criteria (illustrative): 1. P ≥ 0.90 → FAIL (0.60)   2. R(v2) ≥ R(v1) − 0.02 → ok   3. critical regressions = 0 → FAIL (ricavi.limite)   4. wrong-provenance ≤ 2 % → ok
+→ not promoted; no ExtractorVersionPromoted; v2 proposals stay proposed, excluded from reconfirmation

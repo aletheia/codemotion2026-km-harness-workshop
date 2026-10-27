@@ -1,0 +1,6 @@
+0010 ★ ClaimVerified             · human(luca)         · claims    · clm-attivo2m  · ← ev-0006  evidence: note "ok"; span [998,1062)
+0011 ★ ClaimVerified             · human(luca)         · claims    · clm-ricavi2m  · ← ev-0007  evidence: note "ok"; span [1067,1126)
+0012 · ClaimProposed             · human(luca)         · claims    · clm-eserc2    · ← ev-0005
+0013 ★ ClaimVerified             · human(luca)         · claims    · clm-eserc2    · ← ev-0012  evidence: note "added by reviewer"
+0014 · ClaimProposed             · human(luca)         · claims    · clm-dip10     · ← ev-0005
+0015 ★ ClaimVerified             · human(luca)         · claims    · clm-dip10     · ← ev-0014  evidence: note "missing in v1 output"

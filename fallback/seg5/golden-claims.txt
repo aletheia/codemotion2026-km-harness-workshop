@@ -1,0 +1,9 @@
+golden  layer=claims  until=seq 15  actors=human only  excluded: harness-verified 0, import-verified 0, prompt examples 0
+inputs: 1 · expected items: 4   (golden set claims@g1)
+  input ev-0005 (tree-v8 / c2)   expected: esercizi.consecutivi 2 [936,964) · attivo.limite 2,000,000 EUR [1000,1062)
+                                           ricavi.limite 2,000,000 EUR [1067,1126) · dipendenti.limite 10 [1131,1189)
+golden  layer=claims  until=seq 46  actors=human only  excluded: harness-verified 1 (ev-0025), import-verified 0, prompt examples 0
+inputs: 2 · expected items: 7   (golden set claims@g2)
+  input ev-0005 (tree-v8 / c2)   expected: 4 as above
+  input ev-0018 (tree-v9 / c2)   expected: attivo.limite 4,000,000 EUR [1017,1079) · ricavi.limite 4,000,000 EUR [1084,1143) · dipendenti.limite 20 [1148,1206)
+                                 ← human resolutions of ClaimContested ev-0027, ev-0028, ev-0029

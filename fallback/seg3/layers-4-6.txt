@@ -1,0 +1,6 @@
+—    · EntityProposed            · agent(entities@v1)  · entities  · ent-organo    · ← ev-0030
+—    ★ EntityResolved            · harness(catalog)    · entities  · ent-organo    ·            evidence: catalogue "organo di controllo" → organo-di-controllo
+—    · PolicyProposed            · agent(policies@v1)  · policies  · pol-nomina    · ← (EntityResolved)
+—    ★ PolicyVerified            · human(luca)         · policies  · pol-nomina    ·            evidence: cond = ≥1 of attivo/ricavi/dipendenti for 2 yrs; effect = nomina obbligatoria; exc = cessazione 3 yrs
+—    · WorkflowStepProposed      · agent(workflow@v1)  · workflow  · wf-obbligo-1  · ← (PolicyVerified)
+—    ★ WorkflowStepVerified      · human(luca)         · workflow  · wf-obbligo-1  ·            evidence: test input 2.5M/2.6M, 1.5M/1.6M, 8/9 → mandatory at 2019-04-30, not at 2019-06-30

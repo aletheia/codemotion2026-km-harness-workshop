@@ -1,0 +1,10 @@
+beliefs  lineage=cc-art2477  as-of=2019-04-30  (valid time: document version in force on the date)
+  attivo.limite          2,000,000 EUR  clm-attivo2m  human(luca)  ev-0010   in force 2019-03-16 → 2019-06-18  (superseded by clm-attivo4m at ev-0031)
+  ricavi.limite          2,000,000 EUR  clm-ricavi2m  human(luca)  ev-0011   in force 2019-03-16 → 2019-06-18  (superseded by clm-ricavi4m at ev-0033)
+  dipendenti.limite      10             clm-dip10     human(luca)  ev-0015   in force 2019-03-16 → 2019-06-18  (superseded by clm-dip20 at ev-0035)
+  esercizi.consecutivi   2              clm-eserc2    human(luca)  ev-0013   in force 2019-03-16 → 2019-06-18  (reconfirmed by clm-eserc2b at ev-0026)
+beliefs  lineage=cc-art2477  as-of=now
+  attivo.limite          4,000,000 EUR  clm-attivo4m  human(luca)      ev-0030
+  ricavi.limite          4,000,000 EUR  clm-ricavi4m  human(luca)      ev-0032
+  dipendenti.limite      20             clm-dip20     human(luca)      ev-0034
+  esercizi.consecutivi   2              clm-eserc2b   harness(compare) ev-0025   root: human

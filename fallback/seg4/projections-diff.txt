@@ -1,0 +1,13 @@
+projections-diff  promoted=claims@v1  candidate=claims@v2  lineage=cc-art2477  per document version  (candidate = v2 proposals folded as if verified; not a belief)
+version  subject                promoted (v1, verified)      candidate (v2, proposed)     status
+v8       attivo.limite          2,000,000 EUR (superseded)   2,000,000 EUR                same
+v8       ricavi.limite          2,000,000 EUR (superseded)   2,000 EUR                    DIFFERS
+v8       esercizi.consecutivi   2 (superseded)               2                            same
+v8       dipendenti.limite      10 (superseded)              10                           same
+v8       cessazione.esercizi    —                            3                            candidate only (not in unit c2)
+v9       attivo.limite          4,000,000 EUR                4,000,000 EUR                same
+v9       ricavi.limite          4,000,000 EUR                4,000,000 EUR                same
+v9       dipendenti.limite      20                           20                           same
+v9       esercizi.consecutivi   2                            2                            same
+v9       cessazione.esercizi    — (proposed)                 3                            candidate only
+v9       assemblea.termine      — (proposed)                 30 giorni                    candidate only

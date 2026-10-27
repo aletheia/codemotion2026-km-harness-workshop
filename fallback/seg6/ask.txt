@@ -1,0 +1,10 @@
+ask  "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo"  as-of=2019-04-30  policy: monetary, time-limit → human-rooted verified only
+answer: 2,000,000 EUR
+  belief   clm-ricavi2m   verified by human(luca) at ev-0011   in force 2019-03-16 → 2019-06-18
+  evidence span cc-art2477@v8 [1067,1126)  "ricavi delle vendite e delle prestazioni: 2 milioni di euro"
+  superseded later by clm-ricavi4m (ev-0033) — not applicable on 2019-04-30
+ask  "soglia dei ricavi per la nomina obbligatoria dell'organo di controllo"  as-of=now
+answer: 4,000,000 EUR
+  belief   clm-ricavi4m   verified by human(luca) at ev-0032 after ClaimContested ev-0028   successor of clm-ricavi2m
+  evidence span cc-art2477@v9 [1084,1143)  "ricavi delle vendite e delle prestazioni: 4 milioni di euro"
+sources consulted: projection only (CurrentBeliefs, Timeline); raw documents: not read

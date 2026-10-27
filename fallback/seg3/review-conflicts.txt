@@ -1,0 +1,6 @@
+0030 ★ ClaimVerified             · human(luca)         · claims    · clm-attivo4m  · ← ev-0027  evidence: note "L. 55/2019 in force from 2019-06-18"
+0031 ★ ClaimSuperseded           · human(luca)         · claims    · clm-attivo2m  · ← ev-0030  evidence: successor clm-attivo4m; valid until 2019-06-18
+0032 ★ ClaimVerified             · human(luca)         · claims    · clm-ricavi4m  · ← ev-0028  evidence: note "L. 55/2019 in force from 2019-06-18"
+0033 ★ ClaimSuperseded           · human(luca)         · claims    · clm-ricavi2m  · ← ev-0032  evidence: successor clm-ricavi4m; valid until 2019-06-18
+0034 ★ ClaimVerified             · human(luca)         · claims    · clm-dip20     · ← ev-0029  evidence: note "L. 55/2019 in force from 2019-06-18"
+0035 ★ ClaimSuperseded           · human(luca)         · claims    · clm-dip10     · ← ev-0034  evidence: successor clm-dip20; valid until 2019-06-18

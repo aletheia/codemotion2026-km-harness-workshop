@@ -1,0 +1,5 @@
+rag-delete  version=v8  removed=13 chunks  index=cc-art2477 (24 chunks left)
+rag-query  index=cc-art2477  chunks=24  top_k=3  q="soglia ricavi nomina organo di controllo"
+score  chunk                      text (trimmed)
+0.868  cc-art2477-v9 #7           … ricavi delle vendite e delle prestazioni: 4 milioni di euro; …
+0.842  cc-art2477-v7 #6           … due dei limiti indicati dal primo comma dell'articolo 2435-bis.
