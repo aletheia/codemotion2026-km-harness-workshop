@@ -32,6 +32,8 @@ export const scriptNarration: Readonly<Record<string, string>> = {
   'eval:claims-v1': 'runs claims@v1 against golden set g1: alignment by subject key, precision, recall, provenance IoU',
   'eval:claims-v2-summary': 'runs claims@v2 against the same golden set and checks the four promotion criteria',
   'drift:v1-v2': 'per-item comparison of v1 and v2 on g1: what improved, what regressed, what drifted in provenance',
+  'ask:ricavi-2019-04-30': 'an agent consumes the beliefs, not the documents: the ricavi threshold valid on 2019-04-30, with its policy',
+  'ask:ricavi': 'the same question as of today: the answer cites the belief, its verification and its span',
 };
 
 export function narrate(script: string | undefined): void {

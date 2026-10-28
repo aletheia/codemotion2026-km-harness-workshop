@@ -73,4 +73,12 @@ export const segments: Readonly<Record<number, Segment>> = {
       { script: 'drift:v1-v2', why: 'Item by item: the regression on ricavi.limite that an average would hide.' },
     ],
   },
+  6: {
+    title: 'Consumption',
+    expectsEvents: 48,
+    steps: [
+      { script: 'ask:ricavi-2019-04-30', why: 'An agent consumes beliefs, not documents: the answer on 2019-04-30, under the consumption policy.' },
+      { script: 'ask:ricavi', why: 'The same question today: a different answer, with the belief and the span it rests on.' },
+    ],
+  },
 };
