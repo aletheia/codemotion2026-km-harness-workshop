@@ -47,7 +47,7 @@
     "seg:4": "tsx src/tools/segment.ts 4",
     "seg:5": "tsx src/tools/segment.ts 5",
     "seg:6": "tsx src/tools/segment.ts 6",
-    "dry-run": "tsx src/tools/not-implemented.ts dry-run F2",
+    "dry-run": "tsx src/tools/dry-run.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
